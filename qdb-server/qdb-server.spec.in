@@ -1,0 +1,83 @@
+Summary:        quasardb daemons
+Name:           $PACKAGE_NAME
+Version:        $PACKAGE_VERSION
+Release:        1
+License:        Proprietary
+Group:          Applications/Databases
+Vendor:         quasardb SAS
+Prefix:         /usr
+URL:            https://www.quasardb.net/
+BuildArch:      x86_64
+Source0:        $PACKAGE_TARBALL
+Source1:        qdb_httpd.sh
+Source2:        qdbd.sh
+Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
+Requires(postun): /usr/sbin/userdel
+
+
+%description
+quasardb daemons
+
+
+%prep
+%setup -c
+
+
+%install
+mkdir -p                              %{buildroot}%{_localstatedir}/db/qdb
+mkdir -p                              %{buildroot}%{_localstatedir}/run/qdb
+
+mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb
+touch                                 %{buildroot}%{_localstatedir}/log/qdb/qdbd.log
+touch                                 %{buildroot}%{_localstatedir}/log/qdb/qdb_httpd.log
+
+mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
+touch                                 %{buildroot}%{_sysconfdir}/qdb/qdb_license.txt
+
+mkdir -p                              %{buildroot}%{_datadir}/qdb/$PACKAGE_VERSION/console
+cp -r       bin/html                  %{buildroot}%{_datadir}/qdb/$PACKAGE_VERSION/console
+
+mkdir -p                              %{buildroot}%{_initddir}
+cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd
+cp          %{SOURCE2}                %{buildroot}%{_initddir}/qdb_httpd
+
+mkdir -p                              %{buildroot}%{_sbindir}
+cp          bin/qdbd                  %{buildroot}%{_sbindir}/qdbd
+cp          bin/qdb_httpd             %{buildroot}%{_sbindir}/qdb_httpd
+
+mkdir -p                              %{buildroot}%{_bindir}
+cp          bin/qdb_generate_config   %{buildroot}%{_bindir}/qdb_generate_config
+
+%files
+%defattr(644,root,root,755)
+%{_datadir}
+%attr(755,root,root)    %{_bindir}/*
+%attr(755,root,root)    %{_sbindir}/*
+%attr(755,root,root)    %{_initddir}/*                %config(noreplace)
+%attr(640,qdb,qdb)      %{_localstatedir}/log/qdb/*   %config(noreplace)
+%attr(640,qdb,qdb)      %{_sysconfdir}/qdb/*          %config(noreplace)
+
+
+%pre
+/usr/bin/getent group  qdb || /usr/sbin/groupadd -r -f qdb
+/usr/bin/getent passwd qdb || /usr/sbin/useradd -g qdb -r -s /sbin/nologin -d /var/empty/qdb qdb
+
+
+%post
+# need to generate the configuration
+# parameters: [config path] [log path] [db path] [console path]
+# does not overwrite existing files
+%{_bindir}/qdb_generate_config %{_sysconfdir}/qdb %{_localstatedir}/log/qdb %{_localstatedir}/db/qdb %{_datadir}/qdb/@CPACK_PACKAGE_VERSION@/console
+chkconfig --add qdbd
+chkconfig --add qdb_httpd
+
+
+%preun
+service qdb_httpd stop
+service qdbd stop
+chkconfig --del qdb_httpd
+chkconfig --del qdbd
+
+
+%postun
+/usr/sbin/userdel -f qdb

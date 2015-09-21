@@ -1,0 +1,46 @@
+Summary:        quasardb is an advanced, distributed, high-performance key-value store
+Name:           $PACKAGE_NAME
+Version:        $PACKAGE_VERSION
+Release:        1
+License:        Proprietary
+Group:          Applications/Databases
+Vendor:         quasardb SAS
+Prefix:         /usr
+URL:            https://www.quasardb.net/
+BuildArch:      x86_64
+Source0:        $PACKAGE_TARBALL
+
+
+%description
+C/C++ API for quasardb
+
+
+%prep
+%setup -c
+
+
+%install
+
+mkdir -p              %{buildroot}%{_includedir}/qdb-$PACKAGE_VERSION
+mv include/qdb/*      %{buildroot}%{_includedir}/qdb-$PACKAGE_VERSION/
+
+mkdir -p              %{buildroot}%{_libdir}
+mv lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+
+mkdir -p              %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION
+mv example            %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
+
+
+%files
+
+%defattr(644,root,root,755)
+
+%{_includedir}/qdb-$PACKAGE_VERSION/
+%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/example
+%attr(755, root, root) %{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+
+
+%post
+ldconfig
+ln -s -f %{_libdir}/libqdb_api-$PACKAGE_VERSION.so %{_libdir}/libqdb_api.so 
+ln -s -f %{_includedir}/qdb-$PACKAGE_VERSION       %{_includedir}/qdb

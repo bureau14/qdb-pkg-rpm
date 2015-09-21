@@ -1,0 +1,29 @@
+Summary:        quasardb is an advanced, distributed, high-performance key-value store
+Name:           $PACKAGE_NAME
+Version:        $PACKAGE_VERSION
+Release:        1
+License:        Proprietary
+Group:          Applications/Databases
+Vendor:         quasardb SAS
+Prefix:         /usr
+URL:            https://www.quasardb.net/
+BuildArch:      x86_64
+Source0:        $PACKAGE_TARBALL
+
+
+%description
+quasardb client utilities
+
+
+%prep
+%setup -c
+
+
+%install
+mkdir -p %{buildroot}%{_bindir}
+mv bin/* %{buildroot}%{_bindir}/
+
+
+%files
+%defattr(644,root,root,755)
+%{_bindir}/
