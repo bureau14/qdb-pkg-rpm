@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 SPEC_FILE=$1; shift
 PACKAGE_TARBALL=$1; shift
 

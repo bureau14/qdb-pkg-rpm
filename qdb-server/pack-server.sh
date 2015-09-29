@@ -2,8 +2,9 @@
 
 set -eu
 
-PACKAGE_TARBALL=$1
-PATH=$PATH:$(dirname $0)/../common
-SPEC_FILE=$(dirname $0)/qdb-server.spec
+cd $(dirname $0)
 
-pack.sh $SPEC_FILE $PACKAGE_TARBALL $(dirname $0)/init/*
+PACKAGE_TARBALL=$(readlink -e $1)
+PATH=$PATH:../common
+
+pack.sh qdb-server.spec $PACKAGE_TARBALL qdb_httpd_init.sh qdbd_init.sh qdbd_limits.conf qdbd_sysctl.conf

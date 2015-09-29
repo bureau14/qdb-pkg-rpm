@@ -9,8 +9,10 @@ Prefix:         /usr
 URL:            https://www.quasardb.net/
 BuildArch:      x86_64
 Source0:        $PACKAGE_TARBALL
-Source1:        qdb_httpd.sh
-Source2:        qdbd.sh
+Source1:        qdb_httpd_init.sh
+Source2:        qdbd_init.sh
+Source3:        qdbd_limits.conf
+Source4:        qdbd_sysctl.conf
 Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
 Requires(postun): /usr/sbin/userdel
 
@@ -34,12 +36,18 @@ touch                                 %{buildroot}%{_localstatedir}/log/qdb/qdb_
 mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
 touch                                 %{buildroot}%{_sysconfdir}/qdb/qdb_license.txt
 
-mkdir -p                              %{buildroot}%{_datadir}/qdb/$PACKAGE_VERSION/console
-cp -r       bin/html                  %{buildroot}%{_datadir}/qdb/$PACKAGE_VERSION/console
+mkdir -p                              %{buildroot}%{_datadir}/qdb/console
+cp -r       bin/html                  %{buildroot}%{_datadir}/qdb/console
 
 mkdir -p                              %{buildroot}%{_initddir}
-cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd
-cp          %{SOURCE2}                %{buildroot}%{_initddir}/qdb_httpd
+cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdb_httpd
+cp          %{SOURCE2}                %{buildroot}%{_initddir}/qdbd
+
+mkdir -p                              %{buildroot}%{_sysconfdir}/security/limits.d/
+cp          %{SOURCE3}                %{buildroot}%{_sysconfdir}/security/limits.d/50-quasardb.conf
+
+mkdir -p                              %{buildroot}%{_sysconfdir}/sysctl.d/
+cp          %{SOURCE4}                %{buildroot}%{_sysconfdir}/sysctl.d/30-quasardb.conf
 
 mkdir -p                              %{buildroot}%{_sbindir}
 cp          bin/qdbd                  %{buildroot}%{_sbindir}/qdbd
@@ -48,19 +56,29 @@ cp          bin/qdb_httpd             %{buildroot}%{_sbindir}/qdb_httpd
 mkdir -p                              %{buildroot}%{_bindir}
 cp          bin/qdb_generate_config   %{buildroot}%{_bindir}/qdb_generate_config
 
+
 %files
 %defattr(644,root,root,755)
-%{_datadir}
-%attr(755,root,root)    %{_bindir}/*
-%attr(755,root,root)    %{_sbindir}/*
-%attr(755,root,root)    %{_initddir}/*                %config(noreplace)
-%attr(640,qdb,qdb)      %{_localstatedir}/log/qdb/*   %config(noreplace)
-%attr(640,qdb,qdb)      %{_sysconfdir}/qdb/*          %config(noreplace)
+
+%{_datadir}/qdb/console
+
+%attr(755, qdb, qdb)    %dir     %{_localstatedir}/db/qdb
+%attr(755, qdb, qdb)    %dir     %{_localstatedir}/run/qdb
+
+%attr(755, root, root)           %{_bindir}/*
+%attr(755, root, root)           %{_sbindir}/*
+%attr(755, root, root)           %{_initddir}/qdbd                        %config(noreplace)
+%attr(755, root, root)           %{_initddir}/qdb_httpd                   %config(noreplace)
+%attr(640, qdb, qdb)             %{_sysconfdir}/qdb/qdb_license.txt       %config(noreplace)
+%attr(644, root, root)           %{_sysconfdir}/sysctl.d/*                %config(noreplace)
+%attr(644, root, root)           %{_sysconfdir}/security/limits.d/*       %config(noreplace)
+%attr(640, qdb, qdb)             %{_localstatedir}/log/qdb/qdbd.log       %config(noreplace)
+%attr(640, qdb, qdb)             %{_localstatedir}/log/qdb/qdb_httpd.log  %config(noreplace)
 
 
 %pre
-/usr/bin/getent group  qdb || /usr/sbin/groupadd -r -f qdb
-/usr/bin/getent passwd qdb || /usr/sbin/useradd -g qdb -r -s /sbin/nologin -d /var/empty/qdb qdb
+/usr/bin/getent group  qdb >/dev/null || /usr/sbin/groupadd -r -f qdb
+/usr/bin/getent passwd qdb >/dev/null || /usr/sbin/useradd -g qdb -r -s /sbin/nologin -d /var/empty/qdb qdb
 
 
 %post
@@ -70,6 +88,7 @@ cp          bin/qdb_generate_config   %{buildroot}%{_bindir}/qdb_generate_config
 %{_bindir}/qdb_generate_config %{_sysconfdir}/qdb %{_localstatedir}/log/qdb %{_localstatedir}/db/qdb %{_datadir}/qdb/@CPACK_PACKAGE_VERSION@/console
 chkconfig --add qdbd
 chkconfig --add qdb_httpd
+sysctl -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf
 
 
 %preun
