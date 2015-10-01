@@ -88,7 +88,7 @@ cp          bin/qdb_generate_config   %{buildroot}%{_bindir}/qdb_generate_config
 %{_bindir}/qdb_generate_config %{_sysconfdir}/qdb %{_localstatedir}/log/qdb %{_localstatedir}/db/qdb %{_datadir}/qdb/@CPACK_PACKAGE_VERSION@/console
 chkconfig --add qdbd
 chkconfig --add qdb_httpd
-sysctl -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf
+sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf
 
 
 %preun
