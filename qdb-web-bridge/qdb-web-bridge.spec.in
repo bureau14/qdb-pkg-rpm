@@ -1,0 +1,77 @@
+Summary:        quasardb web bridge
+Name:           $PACKAGE_NAME
+Version:        $PACKAGE_VERSION
+Release:        1
+License:        Proprietary
+Group:          Applications/Databases
+Vendor:         quasardb SAS
+Prefix:         /usr
+URL:            https://www.quasardb.net/
+BuildArch:      x86_64
+Source0:        $PACKAGE_TARBALL
+Source1:        qdb_httpd_init.sh
+Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
+Requires(postun): /usr/sbin/userdel
+
+
+%description
+quasardb web bridge
+
+
+%prep
+%setup -c
+
+
+%install
+mkdir -p                                    %{buildroot}%{_localstatedir}/run/qdb_http
+
+mkdir -p                                    %{buildroot}%{_localstatedir}/log/qdb_http
+
+mkdir -p                                    %{buildroot}%{_sysconfdir}/qdb
+
+mkdir -p                                    %{buildroot}%{_datadir}/qdb
+cp -r       bin/html                        %{buildroot}%{_datadir}/qdb/www
+
+mkdir -p                                    %{buildroot}%{_initddir}
+cp          %{SOURCE1}                      %{buildroot}%{_initddir}/qdb_httpd
+
+mkdir -p                                    %{buildroot}%{_sbindir}
+cp          bin/qdb_httpd                   %{buildroot}%{_sbindir}/qdb_httpd
+
+mkdir -p                                    %{buildroot}%{_bindir}
+cp          bin/qdb_httpd_generate_config   %{buildroot}%{_bindir}/qdb_httpd_generate_config
+
+
+%files
+%defattr(644,root,root,755)
+
+%{_datadir}/qdb/www
+
+%attr(750, qdb_http, qdb_http)    %dir     %{_localstatedir}/run/qdb_http
+%attr(750, qdb_http, qdb_http)    %dir     %{_localstatedir}/log/qdb_http
+
+%attr(755, root, root)            %{_bindir}/*
+%attr(755, root, root)            %{_sbindir}/*
+%attr(755, root, root)            %{_initddir}/qdb_httpd           %config(noreplace)
+
+
+%pre
+/usr/bin/getent group  qdb_http >/dev/null || /usr/sbin/groupadd -r -f qdb_http
+/usr/bin/getent passwd qdb_http >/dev/null || /usr/sbin/useradd -g qdb_http -r -s /sbin/nologin -d %{_localstatedir}/run/qdb_http qdb_http
+
+
+%post
+# need to generate the configuration
+# parameters: [config path] [log path] [db path] [www path]
+# does not overwrite existing files
+%{_bindir}/qdb_httpd_generate_config %{_sysconfdir}/qdb %{_localstatedir}/log/qdb_http %{_datadir}/qdb/www
+chkconfig --add qdb_httpd
+
+
+%preun
+service qdb_httpd stop
+chkconfig --del qdb_httpd
+
+
+%postun
+/usr/sbin/userdel -f qdb_http

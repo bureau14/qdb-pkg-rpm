@@ -8,7 +8,7 @@
 #
 # processname: qdb_httpd
 # config: /etc/qdb/qdb_httpd.conf
-# pidfile: /var/run/qdb/qdb_httpd.pid
+# pidfile: /var/run/qdb_http/qdb_httpd.pid
 
 # source function library
 . /etc/init.d/functions
@@ -17,7 +17,7 @@ RETVAL=0
 
 prog=qdb_httpd
 exec=/usr/sbin/qdb_httpd
-pidfile=/var/run/qdb/qdb_httpd.pid
+pidfile=/var/run/qdb_http/qdb_httpd.pid
 lockfile=/var/lock/subsys/qdb_httpd
 
 if [ $UID -ne 0 ] ; then
@@ -27,7 +27,7 @@ fi
 
 start() {
     echo -n $"Starting $prog:"
-    runuser qdb -g qdb -s /bin/sh -c '/usr/sbin/qdb_httpd -c /etc/qdb/qdb_httpd.conf'
+    runuser qdb_http -g qdb_http -s /bin/sh -c '/usr/sbin/qdb_httpd -c /etc/qdb/qdb_httpd.conf'
     RETVAL=$?
     echo
     [ "$RETVAL" = 0 ] && touch $lockfile && /sbin/pidof $exec > $pidfile
