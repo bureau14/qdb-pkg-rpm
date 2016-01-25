@@ -1,10 +1,10 @@
 #!/bin/sh
 #
 # /etc/init.d/qdb_httpd
-# Subsystem file for "quasardb" web console
+# Subsystem file for "quasardb" web bridge
 #
 # chkconfig: 2345 80 20
-# description: quasardb web console daemon
+# description: quasardb web bridge
 #
 # processname: qdb_httpd
 # config: /etc/qdb/qdb_httpd.conf
@@ -36,7 +36,7 @@ start() {
 
 stop() {
     echo -n $"Stopping $prog:"
-    killproc $prog -TERM
+    killproc $exec -TERM
     RETVAL=$?
     echo
     [ "$RETVAL" = 0 ] && rm -f $lockfile

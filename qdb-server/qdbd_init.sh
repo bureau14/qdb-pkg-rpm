@@ -30,7 +30,7 @@ start() {
     runuser qdb -g qdb -s /bin/sh -c '/usr/sbin/qdbd -c /etc/qdb/qdbd.conf'
     RETVAL=$?
     echo
-    [ "$RETVAL" = 0 ] && touch $lockfile && /sbin/pidof /usr/sbin/qdbd > $pidfile
+    [ "$RETVAL" = 0 ] && touch $lockfile && /sbin/pidof $exec > $pidfile
     return $RETVAL
 }
 

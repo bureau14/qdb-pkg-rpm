@@ -23,23 +23,21 @@ quasardb web bridge
 
 
 %install
-mkdir -p                                    %{buildroot}%{_localstatedir}/run/qdb_http
+mkdir -p                   %{buildroot}%{_localstatedir}/run/qdb_http
 
-mkdir -p                                    %{buildroot}%{_localstatedir}/log/qdb_http
+mkdir -p                   %{buildroot}%{_localstatedir}/log/qdb_http
+touch                      %{buildroot}%{_localstatedir}/log/qdb_http/qdb_httpd.log
 
-mkdir -p                                    %{buildroot}%{_sysconfdir}/qdb
+mkdir -p                   %{buildroot}%{_sysconfdir}/qdb
 
-mkdir -p                                    %{buildroot}%{_datadir}/qdb
-cp -r       bin/html                        %{buildroot}%{_datadir}/qdb/www
+mkdir -p                   %{buildroot}%{_datadir}/qdb
+cp -r       bin/html       %{buildroot}%{_datadir}/qdb/www
 
-mkdir -p                                    %{buildroot}%{_initddir}
-cp          %{SOURCE1}                      %{buildroot}%{_initddir}/qdb_httpd
+mkdir -p                   %{buildroot}%{_initddir}
+cp          %{SOURCE1}     %{buildroot}%{_initddir}/qdb_httpd
 
-mkdir -p                                    %{buildroot}%{_sbindir}
-cp          bin/qdb_httpd                   %{buildroot}%{_sbindir}/qdb_httpd
-
-mkdir -p                                    %{buildroot}%{_bindir}
-cp          bin/qdb_httpd_generate_config   %{buildroot}%{_bindir}/qdb_httpd_generate_config
+mkdir -p                   %{buildroot}%{_sbindir}
+cp          bin/qdb_httpd  %{buildroot}%{_sbindir}/qdb_httpd
 
 
 %files
@@ -47,12 +45,13 @@ cp          bin/qdb_httpd_generate_config   %{buildroot}%{_bindir}/qdb_httpd_gen
 
 %{_datadir}/qdb/www
 
+%attr(755, root, root)            %dir     %{_sysconfdir}/qdb
 %attr(750, qdb_http, qdb_http)    %dir     %{_localstatedir}/run/qdb_http
 %attr(750, qdb_http, qdb_http)    %dir     %{_localstatedir}/log/qdb_http
 
-%attr(755, root, root)            %{_bindir}/*
 %attr(755, root, root)            %{_sbindir}/*
-%attr(755, root, root)            %{_initddir}/qdb_httpd           %config(noreplace)
+%attr(755, root, root)            %{_initddir}/qdb_httpd                         %config(noreplace)
+%attr(640, qdb_http, qdb_http)    %{_localstatedir}/log/qdb_http/qdb_httpd.log   %config(noreplace)
 
 
 %pre
@@ -62,9 +61,8 @@ cp          bin/qdb_httpd_generate_config   %{buildroot}%{_bindir}/qdb_httpd_gen
 
 %post
 # need to generate the configuration
-# parameters: [config path] [log path] [db path] [www path]
 # does not overwrite existing files
-%{_bindir}/qdb_httpd_generate_config %{_sysconfdir}/qdb %{_localstatedir}/log/qdb_http %{_datadir}/qdb/www
+[ -e %{_sysconfdir}/qdb/qdb_httpd.conf ] || %{_sbindir}/qdb_httpd --gen-conf=%{_sysconfdir}/qdb/qdb_httpd.conf --daemonize --log-file=%{_localstatedir}/log/qdb_http/qdb_httpd.log --log-dump=%{_localstatedir}/log/qdb_http/qdb_httpd_error_dump.txt --root=%{_datadir}/qdb/www
 chkconfig --add qdb_httpd
 
 
