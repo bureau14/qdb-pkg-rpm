@@ -43,8 +43,8 @@ cp          %{SOURCE2}                %{buildroot}%{_sysconfdir}/security/limits
 mkdir -p                              %{buildroot}%{_sysconfdir}/sysctl.d/
 cp          %{SOURCE3}                %{buildroot}%{_sysconfdir}/sysctl.d/30-quasardb.conf
 
-mkdir -p                              %{buildroot}%{_sbindir}
-cp          bin/qdbd                  %{buildroot}%{_sbindir}/qdbd
+mkdir -p                              %{buildroot}%{_bindir}
+cp          bin/qdbd                  %{buildroot}%{_bindir}/qdbd
 
 
 %files
@@ -55,7 +55,7 @@ cp          bin/qdbd                  %{buildroot}%{_sbindir}/qdbd
 %attr(750, qdb, qdb)    %dir     %{_localstatedir}/run/qdb
 %attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb
 
-%attr(755, root, root)           %{_sbindir}/*
+%attr(755, root, root)           %{_bindir}/*
 %attr(755, root, root)           %{_initddir}/qdbd                        %config(noreplace)
 %attr(640, qdb, qdb)             %{_sysconfdir}/qdb/qdb_license.txt       %config(noreplace)
 %attr(644, root, root)           %{_sysconfdir}/sysctl.d/*                %config(noreplace)
@@ -72,7 +72,7 @@ cp          bin/qdbd                  %{buildroot}%{_sbindir}/qdbd
 # need to generate the configuration
 # parameters: [config path] [log path] [db path] [console path]
 # does not overwrite existing files
-[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_sbindir}/qdbd --gen-config=%{_sysconfdir}/qdb/qdbd.conf --daemonize --log-file=%{_localstatedir}/log/qdb/qdbd.log --log-dump=%{_localstatedir}/log/qdb/qdbd_error_dump.txt --root=%{_localstatedir}/db/qdb
+[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config=%{_sysconfdir}/qdb/qdbd.conf --daemonize --log-file=%{_localstatedir}/log/qdb/qdbd.log --log-dump=%{_localstatedir}/log/qdb/qdbd_error_dump.txt --root=%{_localstatedir}/db/qdb
 chkconfig --add qdbd
 sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf
 

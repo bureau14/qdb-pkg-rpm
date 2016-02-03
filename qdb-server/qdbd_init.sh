@@ -16,7 +16,7 @@
 RETVAL=0
 
 prog=qdbd
-exec=/usr/sbin/qdbd
+exec=/usr/bin/qdbd
 pidfile=/var/run/qdb/qdbd.pid
 lockfile=/var/lock/subsys/qdbd
 
@@ -27,7 +27,7 @@ fi
 
 start() {
     echo -n $"Starting $prog:"
-    runuser qdb -g qdb -s /bin/sh -c '/usr/sbin/qdbd -c /etc/qdb/qdbd.conf'
+    runuser qdb -g qdb -s /bin/sh -c '/usr/bin/qdbd -c /etc/qdb/qdbd.conf'
     RETVAL=$?
     echo
     [ "$RETVAL" = 0 ] && touch $lockfile && /sbin/pidof $exec > $pidfile

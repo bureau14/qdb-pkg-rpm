@@ -16,7 +16,7 @@
 RETVAL=0
 
 prog=qdb_httpd
-exec=/usr/sbin/qdb_httpd
+exec=/usr/bin/qdb_httpd
 pidfile=/var/run/qdb_http/qdb_httpd.pid
 lockfile=/var/lock/subsys/qdb_httpd
 
@@ -27,7 +27,7 @@ fi
 
 start() {
     echo -n $"Starting $prog:"
-    runuser qdb_http -g qdb_http -s /bin/sh -c '/usr/sbin/qdb_httpd -c /etc/qdb/qdb_httpd.conf'
+    runuser qdb_http -g qdb_http -s /bin/sh -c '/usr/bin/qdb_httpd -c /etc/qdb/qdb_httpd.conf'
     RETVAL=$?
     echo
     [ "$RETVAL" = 0 ] && touch $lockfile && /sbin/pidof $exec > $pidfile
