@@ -72,7 +72,7 @@ cp          bin/qdbd                  %{buildroot}%{_bindir}/qdbd
 # need to generate the configuration
 # parameters: [config path] [log path] [db path] [console path]
 # does not overwrite existing files
-[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config=%{_sysconfdir}/qdb/qdbd.conf --daemonize --log-file=%{_localstatedir}/log/qdb/qdbd.log --log-dump=%{_localstatedir}/log/qdb/qdbd_error_dump.txt --root=%{_localstatedir}/db/qdb
+[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config=%{_sysconfdir}/qdb/qdbd.conf --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/db/qdb
 chkconfig --add qdbd
 sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf
 
