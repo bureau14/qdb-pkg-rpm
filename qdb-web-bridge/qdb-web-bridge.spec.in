@@ -23,12 +23,8 @@ quasardb web bridge
 
 
 %install
-# /var/run/qdb_http/
-mkdir -p                   %{buildroot}%{_localstatedir}/run/qdb_http
-
 # /var/log/qdb_httpd/
 mkdir -p                   %{buildroot}%{_localstatedir}/log/qdb_http
-touch                      %{buildroot}%{_localstatedir}/log/qdb_http/qdb_httpd.log
 
 # /etc/qdb/
 mkdir -p                   %{buildroot}%{_sysconfdir}/qdb
@@ -52,24 +48,23 @@ cp          bin/*          %{buildroot}%{_bindir}
 %{_datadir}/qdb/www
 
 %attr(755, root, root)            %dir     %{_sysconfdir}/qdb
-%attr(750, qdb_http, qdb_http)    %dir     %{_localstatedir}/run/qdb_http
 %attr(750, qdb_http, qdb_http)    %dir     %{_localstatedir}/log/qdb_http
 
 %attr(755, root, root)            %{_bindir}/*
 %attr(755, root, root)            %{_initddir}/qdb_httpd                         %config(noreplace)
-%attr(640, qdb_http, qdb_http)    %{_localstatedir}/log/qdb_http/qdb_httpd.log   %config(noreplace)
 
 
 %pre
 /usr/bin/getent group  qdb_http >/dev/null || /usr/sbin/groupadd -r -f qdb_http
-/usr/bin/getent passwd qdb_http >/dev/null || /usr/sbin/useradd -g qdb_http -r -s /sbin/nologin -d %{_localstatedir}/run/qdb_http qdb_http
+/usr/bin/getent passwd qdb_http >/dev/null || /usr/sbin/useradd -g qdb_http -r -s /sbin/nologin qdb_http
 
 
 %post
 # need to generate the configuration
 # does not overwrite existing files
-[ -e %{_sysconfdir}/qdb/qdb_httpd.conf ] || %{_bindir}/qdb_httpd --gen-config=%{_sysconfdir}/qdb/qdb_httpd.conf --daemonize --log-directory=%{_localstatedir}/log/qdb_http --root=%{_datadir}/qdb/www
+[ -e %{_sysconfdir}/qdb/qdb_httpd.conf ] || %{_bindir}/qdb_httpd --gen-config --daemonize --log-directory=%{_localstatedir}/log/qdb_http --root=%{_datadir}/qdb/www > %{_sysconfdir}/qdb/qdb_httpd.conf
 chkconfig --add qdb_httpd
+service qdb_httpd start
 
 
 %preun

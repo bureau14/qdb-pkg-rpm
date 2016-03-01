@@ -27,6 +27,7 @@ fi
 
 start() {
     echo -n $"Starting $prog:"
+    mkdir -p /var/run/qdb
     runuser qdb -g qdb -s /bin/sh -c '/usr/bin/qdbd -c /etc/qdb/qdbd.conf'
     RETVAL=$?
     echo

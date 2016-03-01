@@ -17,5 +17,5 @@ for EXTRA in "$@"; do
     cp -fv "$EXTRA" "$HOME/rpmbuild/SOURCES"
 done
 
-rpmbuild -v -bb "$SPEC_FILE"
+rpmbuild -v -bb "$SPEC_FILE" 2>&1
 find "$HOME/rpmbuild/RPMS" -name '*.rpm' -exec mv {} . \;

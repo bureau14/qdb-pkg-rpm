@@ -24,4 +24,4 @@ To compile the quasardb packages, you need to has these installed:
     # Build package "server"
     cd qdb-server
     wget https://download.quasardb.net/quasardb/2.0/2.0.0rc2/server/qdb-2.0.0-linux-64bit-server.tar.gz
-    ./pack-server.sh qdb-2.0.0-linux-64bit-server.tar.gz
+    ./pack.sh qdb-2.0.0-linux-64bit-server.tar.gz
