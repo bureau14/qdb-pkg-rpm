@@ -24,7 +24,7 @@ function run_test_on_container {
     echo "##teamcity[testSuiteStarted name='$TEST_SUITE']"
 
     echo "##teamcity[testStarted name='start' captureStandardOutput='true']"
-    lxc-create -t download -n $CONTAINER_NAME -- -d $DISTRIBUTION -r $RELEASE -a amd64
+    lxc-create -t download -n $CONTAINER_NAME -- --dist $DISTRIBUTION --release $RELEASE --arch amd64 --force-cache
     lxc-start -n $CONTAINER_NAME
     lxc-wait -n $CONTAINER_NAME -s RUNNING
     echo "Wait $DELAY seconds..."
