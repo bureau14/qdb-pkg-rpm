@@ -118,4 +118,5 @@ build_package qdb-web-bridge *-web-bridge.tar.gz
 set +e
 run_test_on_container centos 6
 run_test_on_container centos 7
-run_test_on_container oracle 6.5
+run_test_on_container oracle 6
+run_test_on_container oracle 7
