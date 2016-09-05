@@ -28,7 +28,7 @@ mkdir -p              %{buildroot}%{_libdir}
 mv lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
 
 mkdir -p              %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION
-mv example            %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
+mv examples           %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
 
 
 %files
@@ -36,7 +36,7 @@ mv example            %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
 %defattr(644,root,root,755)
 
 %{_includedir}/qdb-$PACKAGE_VERSION/
-%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/example
+%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/examples
 %attr(755, root, root) %{_libdir}/libqdb_api-$PACKAGE_VERSION.so
 
 
