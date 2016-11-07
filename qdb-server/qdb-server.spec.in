@@ -25,7 +25,7 @@ quasardb server
 
 
 %install
-mkdir -p                              %{buildroot}%{_localstatedir}/db/qdb
+mkdir -p                              %{buildroot}%{_localstatedir}/lib/qdb
 
 mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb
 
@@ -49,7 +49,7 @@ cp          bin/qdbd                  %{buildroot}%{_bindir}/qdbd
 %defattr(644,root,root,755)
 
 %attr(755, root, root)  %dir     %{_sysconfdir}/qdb
-%attr(750, qdb, qdb)    %dir     %{_localstatedir}/db/qdb
+%attr(750, qdb, qdb)    %dir     %{_localstatedir}/lib/qdb
 %attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb
 
 %attr(755, root, root)           %{_bindir}/*
@@ -68,7 +68,7 @@ cp          bin/qdbd                  %{buildroot}%{_bindir}/qdbd
 # need to generate the configuration
 # parameters: [config path] [log path] [db path] [console path]
 # does not overwrite existing files
-[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/db/qdb > %{_sysconfdir}/qdb/qdbd.conf
+[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
 chkconfig --add qdbd
 sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf 2>&1 || true
 service qdbd start
