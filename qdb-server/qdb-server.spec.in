@@ -29,11 +29,13 @@ mkdir -p                              %{buildroot}%{_localstatedir}/lib/qdb
 
 mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb
 
+mkdir -p                              %{buildroot}%{_localstatedir}/share/qdb
+
 mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
 touch                                 %{buildroot}%{_sysconfdir}/qdb/qdb_license.txt
 
 mkdir -p                              %{buildroot}%{_initddir}
-cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd
+cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd   
 
 #kdir -p                              %{buildroot}%{_sysconfdir}/security/limits.d/
 #p          %{SOURCE2}                %{buildroot}%{_sysconfdir}/security/limits.d/50-quasardb.conf   <----  doesn't work on a container
@@ -42,7 +44,7 @@ mkdir -p                              %{buildroot}%{_sysconfdir}/sysctl.d/
 cp          %{SOURCE3}                %{buildroot}%{_sysconfdir}/sysctl.d/30-quasardb.conf
 
 mkdir -p                              %{buildroot}%{_bindir}
-cp          bin/qdbd                  %{buildroot}%{_bindir}/qdbd
+cp          bin/*                     %{buildroot}%{_bindir}
 
 
 %files
@@ -51,6 +53,7 @@ cp          bin/qdbd                  %{buildroot}%{_bindir}/qdbd
 %attr(755, root, root)  %dir     %{_sysconfdir}/qdb
 %attr(750, qdb, qdb)    %dir     %{_localstatedir}/lib/qdb
 %attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb
+%attr(755, qdb, qdb)    %dir     %{_localstatedir}/share/qdb
 
 %attr(755, root, root)           %{_bindir}/*
 %attr(755, root, root)           %{_initddir}/qdbd                        %config(noreplace)
@@ -65,10 +68,19 @@ cp          bin/qdbd                  %{buildroot}%{_bindir}/qdbd
 
 
 %post
-# need to generate the configuration
-# parameters: [config path] [log path] [db path] [console path]
-# does not overwrite existing files
-[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --security=false --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
+%{_bindir}/qdb_cluster_keygen -s %{_sysconfdir}/qdb/cluster_private.key -p %{_localstatedir}/share/qdb/cluster_public.key
+chown qdb:qdb %{_sysconfdir}/qdb/cluster_private.key
+chmod 0600 %{_sysconfdir}/qdb/cluster_private.key
+chown qdb:qdb %{_localstatedir}/share/qdb/cluster_public.key
+chmod 0644 %{_localstatedir}/share/qdb/cluster_public.key
+
+%{_bindir}/qdb_user_add -u qdbsh -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdbsh_private.key
+chown qdb:qdb %{_sysconfdir}/qdb/users.conf
+chmod 0600 %{_sysconfdir}/qdb/users.conf
+chown qdb:qdb %{_sysconfdir}/qdb/qdbsh_private.key
+chmod 0600 %{_sysconfdir}/qdb/qdbsh_private.key
+
+[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --security=true --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key --user-list=%{_sysconfdir}/qdb/users.conf --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
 chkconfig --add qdbd
 sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf 2>&1 || true
 service qdbd start
