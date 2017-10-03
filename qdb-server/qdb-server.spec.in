@@ -35,7 +35,7 @@ mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
 touch                                 %{buildroot}%{_sysconfdir}/qdb/qdb_license.txt
 
 mkdir -p                              %{buildroot}%{_initddir}
-cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd   
+cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd
 
 #kdir -p                              %{buildroot}%{_sysconfdir}/security/limits.d/
 #p          %{SOURCE2}                %{buildroot}%{_sysconfdir}/security/limits.d/50-quasardb.conf   <----  doesn't work on a container
@@ -68,19 +68,7 @@ cp          bin/*                     %{buildroot}%{_bindir}
 
 
 %post
-%{_bindir}/qdb_cluster_keygen -s %{_sysconfdir}/qdb/cluster_private.key -p %{_localstatedir}/share/qdb/cluster_public.key
-chown qdb:qdb %{_sysconfdir}/qdb/cluster_private.key
-chmod 0600 %{_sysconfdir}/qdb/cluster_private.key
-chown qdb:qdb %{_localstatedir}/share/qdb/cluster_public.key
-chmod 0644 %{_localstatedir}/share/qdb/cluster_public.key
-
-%{_bindir}/qdb_user_add -u qdbsh -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdbsh_private.key
-chown qdb:qdb %{_sysconfdir}/qdb/users.conf
-chmod 0600 %{_sysconfdir}/qdb/users.conf
-chown qdb:qdb %{_sysconfdir}/qdb/qdbsh_private.key
-chmod 0600 %{_sysconfdir}/qdb/qdbsh_private.key
-
-[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --security=true --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key --user-list=%{_sysconfdir}/qdb/users.conf --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
+[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
 chkconfig --add qdbd
 sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf 2>&1 || true
 service qdbd start
