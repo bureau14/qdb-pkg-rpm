@@ -71,7 +71,7 @@ case "$1" in
     2) # upgrade, do nothing
       :
     ;;
-
+esac
 
 %post
 [ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
