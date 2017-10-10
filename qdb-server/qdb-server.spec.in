@@ -63,21 +63,47 @@ cp          bin/*                     %{buildroot}%{_bindir}
 
 
 %pre
-/usr/bin/getent group  qdb >/dev/null || /usr/sbin/groupadd -r -f qdb
-/usr/bin/getent passwd qdb >/dev/null || /usr/sbin/useradd -g qdb -r -s /sbin/nologin qdb
+case "$1" in
+    1) # initial install
+        /usr/bin/getent group  qdb >/dev/null || /usr/sbin/groupadd -r -f qdb
+        /usr/bin/getent passwd qdb >/dev/null || /usr/sbin/useradd -g qdb -r -s /sbin/nologin qdb
+    ;;
+    2) # upgrade, do nothing
+      :
+    ;;
 
 
 %post
 [ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
-chkconfig --add qdbd
-sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf 2>&1 || true
-service qdbd start
 
+case "$1" in
+    1) # initial install
+        chkconfig --add qdbd
+        sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf 2>&1 || true
+        service qdbd start
+    ;;
+    2) # upgrade, just run the service
+        service qdbd start
+    ;;
+esac
 
 %preun
-service qdbd stop
-chkconfig --del qdbd
-
+case "$1" in
+    0) # uninstall
+        service qdbd stop
+        chkconfig --del qdbd
+    ;;
+    1) # upgrade, just stop the service
+        service qdbd stop
+    ;;
+esac
 
 %postun
-/usr/sbin/userdel -f qdb
+case "$1" in
+    0) # uninstall
+        /usr/sbin/userdel -f qdb
+    ;;
+    1) # upgrade, do nothing
+      :
+    ;;
+esac
