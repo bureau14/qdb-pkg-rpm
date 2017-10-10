@@ -35,7 +35,7 @@ mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
 touch                                 %{buildroot}%{_sysconfdir}/qdb/qdb_license.txt
 
 mkdir -p                              %{buildroot}%{_initddir}
-cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd   
+cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd
 
 #kdir -p                              %{buildroot}%{_sysconfdir}/security/limits.d/
 #p          %{SOURCE2}                %{buildroot}%{_sysconfdir}/security/limits.d/50-quasardb.conf   <----  doesn't work on a container
@@ -61,35 +61,64 @@ cp          bin/*                     %{buildroot}%{_bindir}
 %attr(644, root, root)           %{_sysconfdir}/sysctl.d/*                %config(noreplace)
 #%attr(644, root, root)           %{_sysconfdir}/security/limits.d/*       %config(noreplace)  <----  doesn't work on a container
 
-
 %pre
-/usr/bin/getent group  qdb >/dev/null || /usr/sbin/groupadd -r -f qdb
-/usr/bin/getent passwd qdb >/dev/null || /usr/sbin/useradd -g qdb -r -s /sbin/nologin qdb
-
+case "$1" in
+    1) # initial install
+        /usr/bin/getent group  qdb >/dev/null || /usr/sbin/groupadd -r -f qdb
+        /usr/bin/getent passwd qdb >/dev/null || /usr/sbin/useradd -g qdb -r -s /sbin/nologin qdb
+    ;;
+    2) # upgrade, do nothing
+      :
+    ;;
+esac
 
 %post
-%{_bindir}/qdb_cluster_keygen -s %{_sysconfdir}/qdb/cluster_private.key -p %{_localstatedir}/share/qdb/cluster_public.key
-chown qdb:qdb %{_sysconfdir}/qdb/cluster_private.key
-chmod 0600 %{_sysconfdir}/qdb/cluster_private.key
-chown qdb:qdb %{_localstatedir}/share/qdb/cluster_public.key
-chmod 0644 %{_localstatedir}/share/qdb/cluster_public.key
+if [ ! -e %{_localstatedir}/share/qdb/cluster_public.key ]; then
+    %{_bindir}/qdb_cluster_keygen -s %{_sysconfdir}/qdb/cluster_private.key -p %{_localstatedir}/share/qdb/cluster_public.key
+    chown qdb:qdb %{_sysconfdir}/qdb/cluster_private.key
+    chmod 0600 %{_sysconfdir}/qdb/cluster_private.key
+    chown qdb:qdb %{_localstatedir}/share/qdb/cluster_public.key
+    chmod 0644 %{_localstatedir}/share/qdb/cluster_public.key
+fi
 
-%{_bindir}/qdb_user_add -u qdbsh -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdbsh_private.key
-chown qdb:qdb %{_sysconfdir}/qdb/users.conf
-chmod 0600 %{_sysconfdir}/qdb/users.conf
-chown qdb:qdb %{_sysconfdir}/qdb/qdbsh_private.key
-chmod 0600 %{_sysconfdir}/qdb/qdbsh_private.key
+if [ ! -e %{_sysconfdir}/qdb/qdbsh_private.key ]; then
+    %{_bindir}/qdb_user_add -u qdbsh -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdbsh_private.key
+    chown qdb:qdb %{_sysconfdir}/qdb/users.conf
+    chmod 0600 %{_sysconfdir}/qdb/users.conf
+    chown qdb:qdb %{_sysconfdir}/qdb/qdbsh_private.key
+    chmod 0600 %{_sysconfdir}/qdb/qdbsh_private.key
+fi
 
 [ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --security=true --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key --user-list=%{_sysconfdir}/qdb/users.conf --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
-chkconfig --add qdbd
-sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf 2>&1 || true
-service qdbd start
 
+case "$1" in
+    1) # initial install
+        chkconfig --add qdbd
+        sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf 2>&1 || true
+        service qdbd start
+    ;;
+    2) # upgrade, just run the service
+        service qdbd start
+    ;;
+esac
 
 %preun
-service qdbd stop
-chkconfig --del qdbd
-
+case "$1" in
+    0) # uninstall
+        service qdbd stop
+        chkconfig --del qdbd
+    ;;
+    1) # upgrade, just stop the service
+        service qdbd stop
+    ;;
+esac
 
 %postun
-/usr/sbin/userdel -f qdb
+case "$1" in
+    0) # uninstall
+        /usr/sbin/userdel -f qdb
+    ;;
+    1) # upgrade, do nothing
+      :
+    ;;
+esac
