@@ -19,9 +19,9 @@ C/C++ package for all quasardb tools
 
 %prep
 %setup -c
-%setup -T -D -a 1
-%setup -T -D -a 2
-%setup -T -D -a 3
+%setup -c -T -D -a 1
+%setup -c -T -D -a 2
+%setup -c -T -D -a 3
 
 
 %install
