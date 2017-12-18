@@ -8,10 +8,10 @@ Vendor:         quasardb SAS
 Prefix:         /usr
 URL:            https://www.quasardb.net/
 BuildArch:      x86_64
-Source0:        *-c-api.tar.gz
-Source1:        *-server.tar.gz
-Source2:        *-utils.tar.gz
-Source3:        *-web-bridge.tar.gz
+Source0:        $SOURCE_C_API
+Source1:        $SOURCE_SERVER
+Source2:        $SOURCE_UTILS
+Source3:        $SOURCE_WEB_BRIDGE
 
 
 %description
