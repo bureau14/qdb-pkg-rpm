@@ -13,7 +13,8 @@ envsubst < "$SPEC_FILE.in" > "$SPEC_FILE"
 
 echo $PWD
 
-ls -l ..
+ls -l ../qdb-server
+ls -l ../qdb-web-bridge
 
 mkdir -p "$HOME/rpmbuild/SOURCES"
 cp -fv ../*.tar.gz "$HOME/rpmbuild/SOURCES"
