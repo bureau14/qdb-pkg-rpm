@@ -11,18 +11,11 @@ cd $(dirname $0)
 export PACKAGE_VERSION PACKAGE_NAME PACKAGE_TARBALL
 envsubst < "$SPEC_FILE.in" > "$SPEC_FILE"
 
-echo $PWD
-
-ls -l ../qdb-server
-ls -l ../qdb-web-bridge
-
-ls -l ../qdb-server/qdbd_init.sh
-
 mkdir -p "$HOME/rpmbuild/SOURCES"
 cp -fv ../*.tar.gz "$HOME/rpmbuild/SOURCES"
 cp -fv ../qdb-server/qdbd_init.sh "$HOME/rpmbuild/SOURCES"
-cp -fv ../qdb-server/qdbd_limits.sh "$HOME/rpmbuild/SOURCES"
-cp -fv ../qdb-server/qdbd_sysctl.sh "$HOME/rpmbuild/SOURCES"
+cp -fv ../qdb-server/qdbd_limits.conf "$HOME/rpmbuild/SOURCES"
+cp -fv ../qdb-server/qdbd_sysctl.conf "$HOME/rpmbuild/SOURCES"
 cp -fv ../qdb-web-bridge/qdb_httpd_init.sh "$HOME/rpmbuild/SOURCES"
 
 rpmbuild -v -bb "$SPEC_FILE" 2>&1
