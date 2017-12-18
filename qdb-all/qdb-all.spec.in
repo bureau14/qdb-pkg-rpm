@@ -43,8 +43,8 @@ mkdir -p              %{buildroot}%{_libdir}
 mv lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
 
 mkdir -p              %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION
-mkdir -p              %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/examples
-mv examples/*         %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/examples/.
+cp -R examples        %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
+rm -Rf examples
 
 # [server install]
 mkdir -p                              %{buildroot}%{_localstatedir}/lib/qdb
