@@ -1,13 +1,22 @@
 #!/bin/sh -eu
 
+
+SPEC_FILE="qdb-all.spec"
 PACKAGE_TARBALL=$(readlink -e $1)
+PACKAGE_NAME="qdb-all"
+PACKAGE_VERSION=$(echo "$PACKAGE_TARBALL" | sed -r 's/.*qdb-(.*)-linux-.*/\1/')
 
 cd $(dirname $0)
-../common/pack.sh qdb-all.spec $PACKAGE_TARBALL ../qdb-server/qdbd_init.sh ../qdb-server/qdbd_limits.conf ../qdb-server/qdbd_sysctl.conf ../qdb-web-bridge/qdb_httpd_init.sh
 
-#!/bin/sh -eu
+export PACKAGE_VERSION PACKAGE_NAME PACKAGE_TARBALL
+envsubst < "$SPEC_FILE.in" > "$SPEC_FILE"
 
-PACKAGE_TARBALL=$(readlink -e $1)
+mkdir -p "$HOME/rpmbuild/SOURCES"
+cp -fv ../*.tar.gz "$HOME/rpmbuild/SOURCES"
+cp -fv ../qdb-server/qdbd_init.sh "$HOME/rpmbuild/SOURCES"
+cp -fv ../qdb-server/qdbd_limits.sh "$HOME/rpmbuild/SOURCES"
+cp -fv ../qdb-server/qdbd_sysctl.sh "$HOME/rpmbuild/SOURCES"
+cp -fv ../qdb-web-bridge/qdb_httpd_init.sh "$HOME/rpmbuild/SOURCES"
 
-cd $(dirname $0)
-../common/pack.sh qdb-server.spec $PACKAGE_TARBALL qdbd_init.sh qdbd_limits.conf qdbd_sysctl.conf
+rpmbuild -v -bb "$SPEC_FILE" 2>&1
+find "$HOME/rpmbuild/RPMS" -name '*.rpm' -exec mv {} . \;
