@@ -69,27 +69,27 @@ mkdir -p                              %{buildroot}%{_bindir}
 cp          bin/*                     %{buildroot}%{_bindir}
 
 # [utils install]
-mkdir -p %{buildroot}%{_bindir}
-mv bin/* %{buildroot}%{_bindir}/
+mkdir -p                              %{buildroot}%{_bindir}
+cp bin/*                              %{buildroot}%{_bindir}
 
 # [web-bridge install]
 # /var/log/qdb_httpd/
-mkdir -p                   %{buildroot}%{_localstatedir}/log/qdb_http
+mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb_http
 
 # /etc/qdb/
-mkdir -p                   %{buildroot}%{_sysconfdir}/qdb
+mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
 
 # /usr/share/qdb/www/
-mkdir -p                   %{buildroot}%{_datadir}
-cp -r       share/qdb      %{buildroot}%{_datadir}
+mkdir -p                              %{buildroot}%{_datadir}
+cp -r       share/qdb                 %{buildroot}%{_datadir}
 
 # /etc/init/qdb_http
-mkdir -p                   %{buildroot}%{_initddir}
-cp          %{SOURCE7}     %{buildroot}%{_initddir}/qdb_httpd
+mkdir -p                              %{buildroot}%{_initddir}
+cp          %{SOURCE7}                %{buildroot}%{_initddir}/qdb_httpd
 
 # /usr/bin/qdb_httpd
-mkdir -p                   %{buildroot}%{_bindir}
-cp          bin/*          %{buildroot}%{_bindir}
+mkdir -p                              %{buildroot}%{_bindir}
+cp          bin/*                     %{buildroot}%{_bindir}
 
 # end of install
 
