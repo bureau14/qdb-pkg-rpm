@@ -8,14 +8,23 @@ Vendor:         quasardb SAS
 Prefix:         /usr
 URL:            https://www.quasardb.net/
 BuildArch:      x86_64
+# tarball sources
 Source0:        ${SOURCE_C_API}
 Source1:        ${SOURCE_SERVER}
 Source2:        ${SOURCE_UTILS}
 Source3:        ${SOURCE_WEB_BRIDGE}
+# server sources
+Source4:        qdbd_init.sh
+Source5:        qdbd_limits.conf
+Source6:        qdbd_sysctl.conf
+# web-bridge sources
+Source7:        qdb_httpd_init.sh
+Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
+Requires(postun): /usr/sbin/userdel
 
 
 %description
-C/C++ package for all quasardb tools
+All quasardb tools
 
 %prep
 %setup -c
@@ -47,13 +56,13 @@ mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
 touch                                 %{buildroot}%{_sysconfdir}/qdb/qdb_license.txt
 
 mkdir -p                              %{buildroot}%{_initddir}
-cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd
+cp          %{SOURCE4}                %{buildroot}%{_initddir}/qdbd
 
 #kdir -p                              %{buildroot}%{_sysconfdir}/security/limits.d/
-#p          %{SOURCE2}                %{buildroot}%{_sysconfdir}/security/limits.d/50-quasardb.conf   <----  doesn't work on a container
+#p          %{SOURCE5}                %{buildroot}%{_sysconfdir}/security/limits.d/50-quasardb.conf   <----  doesn't work on a container
 
 mkdir -p                              %{buildroot}%{_sysconfdir}/sysctl.d/
-cp          %{SOURCE3}                %{buildroot}%{_sysconfdir}/sysctl.d/30-quasardb.conf
+cp          %{SOURCE6}                %{buildroot}%{_sysconfdir}/sysctl.d/30-quasardb.conf
 
 mkdir -p                              %{buildroot}%{_bindir}
 cp          bin/*                     %{buildroot}%{_bindir}
@@ -75,7 +84,7 @@ cp -r       share/qdb      %{buildroot}%{_datadir}
 
 # /etc/init/qdb_http
 mkdir -p                   %{buildroot}%{_initddir}
-cp          %{SOURCE1}     %{buildroot}%{_initddir}/qdb_httpd
+cp          %{SOURCE7}     %{buildroot}%{_initddir}/qdb_httpd
 
 # /usr/bin/qdb_httpd
 mkdir -p                   %{buildroot}%{_bindir}

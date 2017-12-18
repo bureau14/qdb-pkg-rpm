@@ -1,5 +1,6 @@
 #!/bin/sh -eu
 
+set -e
 
 SPEC_FILE="qdb-all.spec"
 PACKAGE_TARBALL=$(readlink -e $1)
