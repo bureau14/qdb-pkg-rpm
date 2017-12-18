@@ -16,6 +16,8 @@ echo $PWD
 ls -l ../qdb-server
 ls -l ../qdb-web-bridge
 
+ls -l ../qdb-server/qdbd_init.sh
+
 mkdir -p "$HOME/rpmbuild/SOURCES"
 cp -fv ../*.tar.gz "$HOME/rpmbuild/SOURCES"
 cp -fv ../qdb-server/qdbd_init.sh "$HOME/rpmbuild/SOURCES"
