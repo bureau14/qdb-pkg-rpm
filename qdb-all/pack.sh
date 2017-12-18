@@ -11,6 +11,10 @@ cd $(dirname $0)
 export PACKAGE_VERSION PACKAGE_NAME PACKAGE_TARBALL
 envsubst < "$SPEC_FILE.in" > "$SPEC_FILE"
 
+echo $PWD
+
+ls -l ..
+
 mkdir -p "$HOME/rpmbuild/SOURCES"
 cp -fv ../*.tar.gz "$HOME/rpmbuild/SOURCES"
 cp -fv ../qdb-server/qdbd_init.sh "$HOME/rpmbuild/SOURCES"
