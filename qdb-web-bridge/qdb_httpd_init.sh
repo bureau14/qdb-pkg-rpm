@@ -28,7 +28,7 @@ fi
 start() {
     echo -n $"Starting $prog:"
     mkdir -p /var/run/qdb_http
-    runuser qdb_http -g qdb_http -s /bin/sh -c '/usr/bin/qdb_httpd -c /etc/qdb/qdb_httpd.conf'
+    runuser qdb -g qdb -s /bin/sh -c '/usr/bin/qdb_httpd -c /etc/qdb/qdb_httpd.conf'
     RETVAL=$?
     echo
     [ "$RETVAL" = 0 ] && touch $lockfile && /sbin/pidof $exec > $pidfile

@@ -155,7 +155,7 @@ fi
 # add user for qdb_httpd
 if [ ! -e %{_sysconfdir}/qdb/qdb_httpd_private.key ]; then
     %{_bindir}/qdb_user_add -u qdb_httpd -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdb_httpd_private.key
-    chown qdb_http:qdb_http %{_sysconfdir}/qdb/qdb_httpd_private.key
+    chown qdb:qdb %{_sysconfdir}/qdb/qdb_httpd_private.key
     chmod 0600 %{_sysconfdir}/qdb/qdb_httpd_private.key
 fi
 

@@ -116,7 +116,9 @@ esac
 %postun
 case "$1" in
     0) # uninstall
-        /usr/sbin/userdel -f qdb
+        if ! type qdb_httpd > /dev/null ; then
+            /usr/sbin/userdel -f qdb
+        fi
     ;;
     1) # upgrade, do nothing
       :
