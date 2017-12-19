@@ -163,6 +163,9 @@ fi
 # does not overwrite existing files
 [ -e %{_sysconfdir}/qdb/qdb_httpd.conf ] || %{_bindir}/qdb_httpd --gen-config --cluster-public-key-file=%{_localstatedir}/share/qdb/cluster_public.key --user-credentials-file=%{_sysconfdir}/qdb/qdb_httpd_private.key --daemonize --log-directory=%{_localstatedir}/log/qdb_http --root=%{_datadir}/qdb/www > %{_sysconfdir}/qdb/qdb_httpd.conf
 
+echo "------------------------------------------------------"
+echo $1
+echo "------------------------------------------------------"
 case "$1" in
     1) # initial install
         chkconfig --add qdbd
