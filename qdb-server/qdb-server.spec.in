@@ -116,7 +116,7 @@ esac
 %postun
 case "$1" in
     0) # uninstall
-        if ! type qdb_httpd > /dev/null  2>&1 ; then
+        if ! type qdb_httpd  2>&1 /dev/null  ; then
             /usr/sbin/userdel -f qdb
         fi
     ;;
