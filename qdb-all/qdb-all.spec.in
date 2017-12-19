@@ -1,0 +1,221 @@
+Summary:        quasardb is an advanced, distributed, high-performance key-value store
+Name:           $PACKAGE_NAME
+Version:        $PACKAGE_VERSION
+Release:        1
+License:        Proprietary
+Group:          Applications/Databases
+Vendor:         quasardb SAS
+Prefix:         /usr
+URL:            https://www.quasardb.net/
+BuildArch:      x86_64
+# tarball sources
+Source0:        ${SOURCE_C_API}
+Source1:        ${SOURCE_SERVER}
+Source2:        ${SOURCE_UTILS}
+Source3:        ${SOURCE_WEB_BRIDGE}
+# server sources
+Source4:        ../qdb-server/qdbd_init.sh
+Source5:        ../qdb-server/qdbd_limits.conf
+Source6:        ../qdb-server/qdbd_sysctl.conf
+# web-bridge sources
+Source7:        ../qdb-web-bridge/qdb_httpd_init.sh
+Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
+Requires(postun): /usr/sbin/userdel
+
+
+%description
+All quasardb tools
+
+%prep
+%setup -c
+%setup -c -T -D -a 1
+%setup -c -T -D -a 2
+%setup -c -T -D -a 3
+
+
+%install
+
+# [api install]
+mkdir -p              %{buildroot}%{_includedir}/qdb-$PACKAGE_VERSION
+mv include/qdb/*      %{buildroot}%{_includedir}/qdb-$PACKAGE_VERSION/
+
+mkdir -p              %{buildroot}%{_libdir}
+mv lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+
+mkdir -p              %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION
+cp -R examples        %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
+rm -Rf examples
+
+# [server install]
+mkdir -p                              %{buildroot}%{_localstatedir}/lib/qdb
+mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb
+mkdir -p                              %{buildroot}%{_localstatedir}/share/qdb
+
+# /etc/qdb/
+mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
+touch                                 %{buildroot}%{_sysconfdir}/qdb/qdb_license.txt
+
+mkdir -p                              %{buildroot}%{_initddir}
+cp          %{SOURCE4}                %{buildroot}%{_initddir}/qdbd
+
+#kdir -p                              %{buildroot}%{_sysconfdir}/security/limits.d/
+#p          %{SOURCE5}                %{buildroot}%{_sysconfdir}/security/limits.d/50-quasardb.conf   <----  doesn't work on a container
+
+mkdir -p                              %{buildroot}%{_sysconfdir}/sysctl.d/
+cp          %{SOURCE6}                %{buildroot}%{_sysconfdir}/sysctl.d/30-quasardb.conf
+
+mkdir -p                              %{buildroot}%{_initddir}
+cp          %{SOURCE7}                %{buildroot}%{_initddir}/qdb_httpd
+
+mkdir -p                              %{buildroot}%{_bindir}
+mv          bin/*                     %{buildroot}%{_bindir}
+
+# /usr/share/qdb/www/
+mkdir -p                              %{buildroot}%{_datadir}
+cp -r       share/qdb                 %{buildroot}%{_datadir}
+
+# /var/log/qdb_httpd/
+mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb_http
+
+# end of install
+
+
+%files
+%defattr(644,root,root,755)
+
+# [api files]
+%{_includedir}/qdb-$PACKAGE_VERSION/
+%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/examples
+%attr(755, root, root) %{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+
+# [server files]
+%attr(755, root, root)  %dir     %{_sysconfdir}/qdb
+%attr(750, qdb, qdb)    %dir     %{_localstatedir}/lib/qdb
+%attr(755, qdb, qdb)    %dir     %{_localstatedir}/share/qdb
+%attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb
+%attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb_http
+
+%attr(755, root, root)           %{_bindir}/*
+%attr(755, root, root)           %{_initddir}/qdbd                        %config(noreplace)
+%attr(755, root, root)           %{_initddir}/qdb_httpd                   %config(noreplace)
+%attr(640, qdb, qdb)             %{_sysconfdir}/qdb/qdb_license.txt       %config(noreplace)
+%attr(644, root, root)           %{_sysconfdir}/sysctl.d/*                %config(noreplace)
+#%attr(644, root, root)           %{_sysconfdir}/security/limits.d/*       %config(noreplace)  <----  doesn't work on a container
+
+%{_datadir}/qdb/www
+
+
+
+%pre
+
+# [server pre-install]
+case "$1" in
+    1) # initial install
+        /usr/bin/getent group  qdb >/dev/null || /usr/sbin/groupadd -r -f qdb
+        /usr/bin/getent passwd qdb >/dev/null || /usr/sbin/useradd -g qdb -r -s /sbin/nologin qdb
+    ;;
+    2) # upgrade, do nothing
+      :
+    ;;
+esac
+
+
+# end of pre-install
+
+
+%post
+
+# [api post-install]
+ldconfig
+ln -s -f %{_libdir}/libqdb_api-$PACKAGE_VERSION.so %{_libdir}/libqdb_api.so 
+ln -s -f %{_includedir}/qdb-$PACKAGE_VERSION       %{_includedir}/qdb
+
+# [server post-install]
+if [ ! -e %{_localstatedir}/share/qdb/cluster_public.key ]; then
+    %{_bindir}/qdb_cluster_keygen -s %{_sysconfdir}/qdb/cluster_private.key -p %{_localstatedir}/share/qdb/cluster_public.key
+    chown qdb:qdb %{_sysconfdir}/qdb/cluster_private.key
+    chmod 0600 %{_sysconfdir}/qdb/cluster_private.key
+    chown qdb:qdb %{_localstatedir}/share/qdb/cluster_public.key
+    chmod 0644 %{_localstatedir}/share/qdb/cluster_public.key
+else
+    echo "Cluster keys already exist."
+fi
+
+if [ ! -e %{_sysconfdir}/qdb/qdbsh_private.key ]; then
+    %{_bindir}/qdb_user_add -u qdbsh -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdbsh_private.key
+    chown qdb:qdb %{_sysconfdir}/qdb/users.conf
+    chmod 0600 %{_sysconfdir}/qdb/users.conf
+    chown qdb:qdb %{_sysconfdir}/qdb/qdbsh_private.key
+    chmod 0600 %{_sysconfdir}/qdb/qdbsh_private.key
+else
+    echo "qdbsh cluster user already exists."
+fi
+
+[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --security=true --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key --user-list=%{_sysconfdir}/qdb/users.conf --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
+
+
+# [web bridge post-install]
+# add user for qdb_httpd
+if [ ! -e %{_sysconfdir}/qdb/qdb_httpd_private.key ]; then
+    %{_bindir}/qdb_user_add -u qdb_httpd -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdb_httpd_private.key
+    chown qdb:qdb %{_sysconfdir}/qdb/qdb_httpd_private.key
+    chmod 0600 %{_sysconfdir}/qdb/qdb_httpd_private.key
+else
+    echo "qdb_httpd cluster user already exists."
+fi
+
+# need to generate the configuration
+# does not overwrite existing files
+[ -e %{_sysconfdir}/qdb/qdb_httpd.conf ] || %{_bindir}/qdb_httpd --gen-config --cluster-public-key-file=%{_localstatedir}/share/qdb/cluster_public.key --user-credentials-file=%{_sysconfdir}/qdb/qdb_httpd_private.key --daemonize --log-directory=%{_localstatedir}/log/qdb_http --root=%{_datadir}/qdb/www > %{_sysconfdir}/qdb/qdb_httpd.conf
+
+echo "------------------------------------------------------"
+echo $1
+echo "------------------------------------------------------"
+case "$1" in
+    1) # initial install
+        chkconfig --add qdbd
+        sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf 2>&1 || true
+        service qdbd start
+
+        chkconfig --add qdb_httpd
+        service qdb_httpd start
+    ;;
+    2) # upgrade, just run the service
+        service qdbd start
+        service qdb_httpd start
+    ;;
+esac
+
+# end of post-install
+
+
+%preun
+
+# [ server pre-uninstall ]
+case "$1" in
+    0) # uninstall
+        service qdbd stop
+        chkconfig --del qdbd
+
+        service qdb_httpd stop
+        chkconfig --del qdb_httpd
+    ;;
+    1) # upgrade, just stop the service
+        service qdbd stop
+        service qdb_httpd stop
+    ;;
+esac
+# end of pre-uninstall
+
+%postun
+
+# [ server post-uninstall ]
+case "$1" in
+    0) # uninstall
+        /usr/sbin/userdel -f qdb
+    ;;
+    1) # upgrade, do nothing
+      :
+    ;;
+esac
+# end of post-uninstall

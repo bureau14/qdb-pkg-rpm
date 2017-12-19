@@ -48,7 +48,7 @@ cp          bin/*          %{buildroot}%{_bindir}
 %{_datadir}/qdb/www
 
 %attr(755, root, root)            %dir     %{_sysconfdir}/qdb
-%attr(750, qdb_http, qdb_http)    %dir     %{_localstatedir}/log/qdb_http
+%attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb_http
 
 %attr(755, root, root)            %{_bindir}/*
 %attr(755, root, root)            %{_initddir}/qdb_httpd                         %config(noreplace)
@@ -57,8 +57,8 @@ cp          bin/*          %{buildroot}%{_bindir}
 %pre
 case "$1" in
     1) # initial install
-        /usr/bin/getent group  qdb_http >/dev/null || /usr/sbin/groupadd -r -f qdb_http
-        /usr/bin/getent passwd qdb_http >/dev/null || /usr/sbin/useradd -g qdb_http -r -s /sbin/nologin qdb_http
+        /usr/bin/getent group  qdb >/dev/null || /usr/sbin/groupadd -r -f qdb
+        /usr/bin/getent passwd qdb >/dev/null || /usr/sbin/useradd -g qdb -r -s /sbin/nologin qdb
     ;;
     2) # upgrade, do nothing
       :
@@ -69,7 +69,7 @@ esac
 # add user for qdb_httpd
 if [ ! -e %{_sysconfdir}/qdb/qdb_httpd_private.key ]; then
     %{_bindir}/qdb_user_add -u qdb_httpd -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdb_httpd_private.key
-    chown qdb_http:qdb_http %{_sysconfdir}/qdb/qdb_httpd_private.key
+    chown qdb:qdb %{_sysconfdir}/qdb/qdb_httpd_private.key
     chmod 0600 %{_sysconfdir}/qdb/qdb_httpd_private.key
 fi
 
@@ -101,7 +101,9 @@ esac
 %postun
 case "$1" in
     0) # uninstall
-        /usr/sbin/userdel -f qdb_http
+        if ! type qdbd &> /dev/null; then
+            /usr/sbin/userdel -f qdb
+        fi
     ;;
     1) # upgrade, do nothing
       :
