@@ -130,8 +130,8 @@ sleep $DELAY
 echo "##teamcity[testFinished name='reboot']"
 
 echo "##teamcity[testStarted name='all.qdbsh.get.after-reboot' captureStandardOutput='true']"
-RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- qdbsh --user-credentials-file=/etc/qdb/qdbsh_private.key --cluster-public-key=/var/share/qdb/cluster_public.key -c "blob_get hello") || echo "##teamcity[testFailed name='all.qdbsh.get.after-reboot' message='Failed to get blob']"
-[ "$RESULT" = "world" ] || echo "##teamcity[testFailed name='all.qdbsh.get' message='Invalid output from blob_get']"
+RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- qdbsh --user-credentials-file=/etc/qdb/qdbsh_private.key --cluster-public-key=/var/share/qdb/cluster_public.key -c "blob_get alias") || echo "##teamcity[testFailed name='all.qdbsh.get.after-reboot' message='Failed to get blob']"
+[ "$RESULT" = "content" ] || echo "##teamcity[testFailed name='all.qdbsh.get' message='Invalid output from blob_get']"
 echo "##teamcity[testFinished name='all.qdbsh.get.after-reboot']"
 
 echo "##teamcity[testStarted name='all.web-bridge.wget.after-reboot' captureStandardOutput='true']"
