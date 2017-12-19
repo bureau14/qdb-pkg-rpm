@@ -101,7 +101,7 @@ esac
 %postun
 case "$1" in
     0) # uninstall
-        if ! type qdbd  2>&1 /dev/null; then
+        if ! type qdbd &> /dev/null; then
             /usr/sbin/userdel -f qdb
         fi
     ;;
