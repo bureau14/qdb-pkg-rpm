@@ -14,11 +14,11 @@ Source1:        ${SOURCE_SERVER}
 Source2:        ${SOURCE_UTILS}
 Source3:        ${SOURCE_WEB_BRIDGE}
 # server sources
-Source4:        qdbd_init.sh
-Source5:        qdbd_limits.conf
-Source6:        qdbd_sysctl.conf
+Source4:        ../qdb-server/qdbd_init.sh
+Source5:        ../qdb-server/qdbd_limits.conf
+Source6:        ../qdb-server/qdbd_sysctl.conf
 # web-bridge sources
-Source7:        qdb_httpd_init.sh
+Source7:        ../qdb-web-bridge/qdb_httpd_init.sh
 Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
 Requires(postun): /usr/sbin/userdel
 
@@ -94,7 +94,6 @@ mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb_http
 %attr(755, qdb, qdb)    %dir     %{_localstatedir}/share/qdb
 %attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb
 %attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb_http
-#%attr(750, qdb_http, qdb_http)    %dir     %{_localstatedir}/log/qdb_http
 
 %attr(755, root, root)           %{_bindir}/*
 %attr(755, root, root)           %{_initddir}/qdbd                        %config(noreplace)
