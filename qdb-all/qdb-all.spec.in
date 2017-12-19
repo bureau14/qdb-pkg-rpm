@@ -137,6 +137,8 @@ if [ ! -e %{_localstatedir}/share/qdb/cluster_public.key ]; then
     chmod 0600 %{_sysconfdir}/qdb/cluster_private.key
     chown qdb:qdb %{_localstatedir}/share/qdb/cluster_public.key
     chmod 0644 %{_localstatedir}/share/qdb/cluster_public.key
+else
+    echo "Cluster keys already exist."
 fi
 
 if [ ! -e %{_sysconfdir}/qdb/qdbsh_private.key ]; then
@@ -145,6 +147,8 @@ if [ ! -e %{_sysconfdir}/qdb/qdbsh_private.key ]; then
     chmod 0600 %{_sysconfdir}/qdb/users.conf
     chown qdb:qdb %{_sysconfdir}/qdb/qdbsh_private.key
     chmod 0600 %{_sysconfdir}/qdb/qdbsh_private.key
+else
+    echo "qdbsh cluster user already exists."
 fi
 
 [ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --security=true --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key --user-list=%{_sysconfdir}/qdb/users.conf --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
@@ -156,6 +160,8 @@ if [ ! -e %{_sysconfdir}/qdb/qdb_httpd_private.key ]; then
     %{_bindir}/qdb_user_add -u qdb_httpd -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdb_httpd_private.key
     chown qdb:qdb %{_sysconfdir}/qdb/qdb_httpd_private.key
     chmod 0600 %{_sysconfdir}/qdb/qdb_httpd_private.key
+else
+    echo "qdb_httpd cluster user already exists."
 fi
 
 # need to generate the configuration
