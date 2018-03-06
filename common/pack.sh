@@ -11,7 +11,7 @@ fi
 PACKAGE_NAME=$(basename "$SPEC_FILE" '.spec')
 PACKAGE_VERSION=$(echo "$PACKAGE_TARBALL" | sed -r 's/.*qdb-(.*)-linux-.*/\1/')
 
-export PACKAGE_VERSION PACKAGE_NAME PACKAGE_TARBALL
+export PACKAGE_VERSION PACKAGE_NAME PACKAGE_TARBALL BENCHMARK_TARBALL
 envsubst < "$SPEC_FILE.in" > "$SPEC_FILE"
 
 mkdir -p "$HOME/rpmbuild/SOURCES"
