@@ -9,6 +9,7 @@ Prefix:         /usr
 URL:            https://www.quasardb.net/
 BuildArch:      x86_64
 Source0:        $PACKAGE_TARBALL
+Source1:        $BENCHMARK_TARBALL
 
 
 %description

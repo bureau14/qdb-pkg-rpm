@@ -1,9 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 SPEC_FILE=$1; shift
 PACKAGE_TARBALL=$1; shift
+if [[ $1 = *"qdb-benchmark"* ]]; then
+    BENCHMARK_TARBALL=$1
+fi
 
 PACKAGE_NAME=$(basename "$SPEC_FILE" '.spec')
 PACKAGE_VERSION=$(echo "$PACKAGE_TARBALL" | sed -r 's/.*qdb-(.*)-linux-.*/\1/')
