@@ -4,7 +4,7 @@ set -e
 
 SPEC_FILE=$1; shift
 PACKAGE_TARBALL=$1; shift
-if [[ $1 = *"qdb-benchmark"* ]]; then
+if [[ "$1" == *"qdb-benchmark"* ]]; then
     BENCHMARK_TARBALL=$1
 fi
 
