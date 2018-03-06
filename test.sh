@@ -59,6 +59,10 @@ RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- qdbsh --user-credenti
 [ "$RESULT" = "world" ] || echo "##teamcity[testFailed name='qdbsh.get' message='Invalid output from blob_get']"
 echo "##teamcity[testFinished name='qdbsh.get']"
 
+echo "##teamcity[testStarted name='qdb-benchmark.put' captureStandardOutput='true']"
+sudo lxc-attach --clear-env -n $CONTAINER_NAME -- qdb-benchmark --cluster-public-key-file=/usr/share/qdb/cluster_public.key --user-credentials-file=/etc/qdb/qdbsh_private.key --threads 1 --size 2k --tests qdb_blob_put || echo "##teamcity[testFailed name='qdb-benchmark.put' message='Failed to put blob']"
+echo "##teamcity[testFinished name='qdb-benchmark.put']"
+
 echo "##teamcity[testStarted name='web-bridge.wget' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- wget -qS http://127.0.0.1:8080 2>&1 || echo "##teamcity[testFailed name='web-bridge.wget' message='Failed to wget 127.0.0.1:8080']"
 echo "##teamcity[testFinished name='web-bridge.wget']"
@@ -83,10 +87,6 @@ echo "##teamcity[testStarted name='web-bridge.wget.after-reboot' captureStandard
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- wget -qS http://127.0.0.1:8080 2>&1 || echo "##teamcity[testFailed name='web-bridge.wget.after-reboot' message='Failed to wget 127.0.0.1:8080']"
 echo "##teamcity[testFinished name='web-bridge.wget.after-reboot']"
 
-echo "##teamcity[testStarted name='api.uninstall' captureStandardOutput='true']"
-sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-api || echo "##teamcity[testFailed name='api.uninstall' message='Failed to uninstall API']"
-echo "##teamcity[testFinished name='api.uninstall']"
-
 echo "##teamcity[testStarted name='server.uninstall' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-server || echo "##teamcity[testFailed name='server.uninstall' message='Failed to uninstall server']"
 echo "##teamcity[testFinished name='server.uninstall']"
@@ -94,6 +94,10 @@ echo "##teamcity[testFinished name='server.uninstall']"
 echo "##teamcity[testStarted name='utils.uninstall' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-utils || echo "##teamcity[testFailed name='utils.uninstall' message='Failed to uninstall utils']"
 echo "##teamcity[testFinished name='utils.uninstall']"
+
+echo "##teamcity[testStarted name='api.uninstall' captureStandardOutput='true']"
+sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-api || echo "##teamcity[testFailed name='api.uninstall' message='Failed to uninstall API']"
+echo "##teamcity[testFinished name='api.uninstall']"
 
 echo "##teamcity[testStarted name='web-bridge.uninstall' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-web-bridge || echo "##teamcity[testFailed name='web-bridge.uninstall' message='Failed to uninstall web-bridge']"
