@@ -8,6 +8,8 @@ if [[ $1 = *"qdb-benchmark"* ]]; then
     BENCHMARK_TARBALL=$1
 fi
 
+echo "BENCHMARK_TARBALL: $BENCHMARK_TARBALL"
+
 PACKAGE_NAME=$(basename "$SPEC_FILE" '.spec')
 PACKAGE_VERSION=$(echo "$PACKAGE_TARBALL" | sed -r 's/.*qdb-(.*)-linux-.*/\1/')
 
