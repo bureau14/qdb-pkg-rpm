@@ -50,6 +50,9 @@ echo "##teamcity[testStarted name='web-bridge.install' captureStandardOutput='tr
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -i /mnt/$QDB_HTTP || echo "##teamcity[testFailed name='web-bridge.install' message='Failed to install web-bridge']"
 echo "##teamcity[testFinished name='web-bridge.install']"
 
+echo "Wait $DELAY seconds..."
+sleep $DELAY
+
 echo "##teamcity[testStarted name='qdbsh.put' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- qdbsh --user-credentials-file=/etc/qdb/qdbsh_private.key --cluster-public-key=/var/share/qdb/cluster_public.key -c "blob_put hello world" || echo "##teamcity[testFailed name='qdbsh.put' message='Failed to put blob']"
 echo "##teamcity[testFinished name='qdbsh.put']"
