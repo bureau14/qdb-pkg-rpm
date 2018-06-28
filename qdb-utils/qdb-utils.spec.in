@@ -10,6 +10,7 @@ URL:            https://www.quasardb.net/
 BuildArch:      x86_64
 Source0:        $PACKAGE_TARBALL
 Source1:        $BENCHMARK_TARBALL
+Source2:        $RAILGUN_TARBALL
 
 
 %description
@@ -19,6 +20,7 @@ quasardb client utilities
 %prep
 %setup -c
 %setup -c -T -D -a 1
+%setup -c -T -D -a 2
 
 
 %install
