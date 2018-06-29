@@ -28,7 +28,7 @@ mkdir -p              %{buildroot}%{_libdir}
 cp lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
 
 mkdir -p              %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION
-cp examples           %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
+cp -R examples        %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
 
 
 %files
