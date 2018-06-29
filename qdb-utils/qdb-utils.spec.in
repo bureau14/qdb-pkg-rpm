@@ -20,7 +20,7 @@ quasardb client utilities
 
 %install
 mkdir -p %{buildroot}%{_bindir}
-mv bin/* %{buildroot}%{_bindir}/
+cp bin/* %{buildroot}%{_bindir}/
 
 
 %files

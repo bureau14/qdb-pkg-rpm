@@ -37,10 +37,10 @@ All quasardb tools
 
 # [api install]
 mkdir -p              %{buildroot}%{_includedir}/qdb-$PACKAGE_VERSION
-mv include/qdb/*      %{buildroot}%{_includedir}/qdb-$PACKAGE_VERSION/
+cp include/qdb/*      %{buildroot}%{_includedir}/qdb-$PACKAGE_VERSION/
 
 mkdir -p              %{buildroot}%{_libdir}
-mv lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+cp lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
 
 mkdir -p              %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION
 cp -R examples        %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
@@ -68,7 +68,7 @@ mkdir -p                              %{buildroot}%{_initddir}
 cp          %{SOURCE7}                %{buildroot}%{_initddir}/qdb_httpd
 
 mkdir -p                              %{buildroot}%{_bindir}
-mv          bin/*                     %{buildroot}%{_bindir}
+cp          bin/*                     %{buildroot}%{_bindir}
 
 # /usr/share/qdb/www/
 mkdir -p                              %{buildroot}%{_datadir}
