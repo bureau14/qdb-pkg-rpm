@@ -14,6 +14,7 @@ Source0:        $PACKAGE_TARBALL
 %description
 quasardb client utilities
 
+Provides:         libqdb_api.so()(64bit)
 
 %prep
 %setup -c
