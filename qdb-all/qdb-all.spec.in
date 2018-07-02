@@ -19,6 +19,7 @@ Source5:        ../qdb-server/qdbd_limits.conf
 Source6:        ../qdb-server/qdbd_sysctl.conf
 # web-bridge sources
 Source7:        ../qdb-web-bridge/qdb_httpd_init.sh
+Provides:         libqdb_api.so()(64bit)
 Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
 Requires(postun): /usr/sbin/userdel
 
