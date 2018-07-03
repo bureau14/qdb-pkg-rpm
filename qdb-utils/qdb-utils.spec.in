@@ -9,21 +9,28 @@ Prefix:         /usr
 URL:            https://www.quasardb.net/
 BuildArch:      x86_64
 Source0:        $PACKAGE_TARBALL
+Provides:         libqdb_api.so()(64bit)
 
 
 %description
 quasardb client utilities
 
-Provides:         libqdb_api.so()(64bit)
-
 %prep
 %setup -c
 
 %install
-mkdir -p %{buildroot}%{_bindir}
-cp bin/* %{buildroot}%{_bindir}/
+mkdir -p                %{buildroot}%{_bindir}
+cp bin/*                %{buildroot}%{_bindir}/
+mkdir -p                %{buildroot}%{_libdir}
+cp -f lib/libqdb_api.so %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
 
 
 %files
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root)    %{_bindir}/*
+%attr(755,root,root)    %{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+%exclude                %{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+
+%post
+ldconfig
+ln -s -f %{_libdir}/libqdb_api-$PACKAGE_VERSION.so %{_libdir}/libqdb_api.so
