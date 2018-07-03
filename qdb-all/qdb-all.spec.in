@@ -41,7 +41,7 @@ mkdir -p              %{buildroot}%{_includedir}/qdb-$PACKAGE_VERSION
 cp include/qdb/*      %{buildroot}%{_includedir}/qdb-$PACKAGE_VERSION/
 
 mkdir -p              %{buildroot}%{_libdir}
-cp lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+cp lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api.so.$PACKAGE_VERSION
 
 mkdir -p              %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION
 cp -R examples        %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
@@ -87,7 +87,7 @@ mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb_http
 # [api files]
 %{_includedir}/qdb-$PACKAGE_VERSION/
 %{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/examples
-%attr(755, root, root) %{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+%attr(755, root, root) %{_libdir}/libqdb_api.so.$PACKAGE_VERSION
 
 # [server files]
 %attr(755, root, root)  %dir     %{_sysconfdir}/qdb
@@ -128,7 +128,7 @@ esac
 
 # [api post-install]
 ldconfig
-ln -s -f %{_libdir}/libqdb_api-$PACKAGE_VERSION.so %{_libdir}/libqdb_api.so 
+ln -s -f %{_libdir}/libqdb_api.so.$PACKAGE_VERSION %{_libdir}/libqdb_api.so 
 ln -s -f %{_includedir}/qdb-$PACKAGE_VERSION       %{_includedir}/qdb
 
 # [server post-install]

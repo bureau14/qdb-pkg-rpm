@@ -22,15 +22,15 @@ quasardb client utilities
 mkdir -p                %{buildroot}%{_bindir}
 cp bin/*                %{buildroot}%{_bindir}/
 mkdir -p                %{buildroot}%{_libdir}
-cp -f lib/libqdb_api.so %{buildroot}%{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+cp -f lib/libqdb_api.so %{buildroot}%{_libdir}/libqdb_api.so.$PACKAGE_VERSION
 
 
 %files
 %defattr(644,root,root,755)
 %attr(755,root,root)    %{_bindir}/*
-%attr(755,root,root)    %{_libdir}/libqdb_api-$PACKAGE_VERSION.so
-%exclude                %{_libdir}/libqdb_api-$PACKAGE_VERSION.so
+%attr(755,root,root)    %{_libdir}/libqdb_api.so.$PACKAGE_VERSION
+%exclude                %{_libdir}/libqdb_api.so.$PACKAGE_VERSION
 
 %post
 ldconfig
-ln -s -f %{_libdir}/libqdb_api-$PACKAGE_VERSION.so %{_libdir}/libqdb_api.so
+ln -s -f %{_libdir}/libqdb_api.so.$PACKAGE_VERSION %{_libdir}/libqdb_api.so
