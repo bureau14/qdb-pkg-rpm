@@ -1,16 +1,18 @@
-Summary:        quasardb is an advanced, distributed, high-performance key-value store
-Name:           $PACKAGE_NAME
-Version:        $PACKAGE_VERSION
-Release:        1
-License:        Proprietary
-Group:          Applications/Databases
-Vendor:         quasardb SAS
-Prefix:         /usr
-URL:            https://www.quasardb.net/
-BuildArch:      x86_64
-Source0:        $PACKAGE_TARBALL
-Source1:        qdb_api_rest_init.sh
-Requires:       qdb-api == $PACKAGE_VERSION
+Summary:          quasardb is an advanced, distributed, high-performance key-value store
+Name:             $PACKAGE_NAME
+Version:          $PACKAGE_VERSION
+Release:          1
+License:          Proprietary
+Group:            Applications/Databases
+Vendor:           quasardb SAS
+Prefix:           /usr
+URL:              https://www.quasardb.net/
+BuildArch:        x86_64
+Source0:          $PACKAGE_TARBALL
+Source1:          qdb_api_rest_init.sh
+Requires:         qdb-api == $PACKAGE_VERSION
+Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
+Requires(postun): /usr/sbin/userdel
 
 %description
 quasardb api rest
@@ -35,7 +37,13 @@ cp          %{SOURCE1}     %{buildroot}%{_initddir}/qdb_api_rest
 %files
 %defattr(644,root,root,755)
 %attr(755, qdb, qdb)    %dir     %{_localstatedir}/share/qdb
+%attr(755, qdb, qdb)    %dir     %{_sysconfdir}/qdb
 %attr(755,root,root)    %{_bindir}/*
+
+%attr(755, root, root)           %{_initddir}/qdb_api_rest                  %config(noreplace)
+%attr(640, qdb, qdb)             %{_sysconfdir}/qdb/rest-api.cert.pem       %config(noreplace)
+%attr(640, qdb, qdb)             %{_sysconfdir}/qdb/rest-api.key.pem        %config(noreplace)
+%attr(640, qdb, qdb)             %{_localstatedir}/share/qdb/default.cfg    %config(noreplace)
 
 %pre
 case "$1" in
