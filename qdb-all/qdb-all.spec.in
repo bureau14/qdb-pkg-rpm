@@ -13,7 +13,7 @@ Source0:        ${SOURCE_C_API}
 Source1:        ${SOURCE_SERVER}
 Source2:        ${SOURCE_UTILS}
 Source3:        ${SOURCE_WEB_BRIDGE}
-Source3:        ${SOURCE_API_REST}
+Source4:        ${SOURCE_API_REST}
 # server sources
 Source5:        ../qdb-server/qdbd_init.sh
 Source6:        ../qdb-server/qdbd_limits.conf
