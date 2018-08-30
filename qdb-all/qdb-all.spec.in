@@ -123,8 +123,6 @@ mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb_http
 %attr(640, qdb, qdb)   %{_localstatedir}/share/qdb/default.cfg    %config(noreplace)
 
 %{_datadir}/qdb
-%{_datadir}/share
-%{_datadir}/www
 
 
 %pre
