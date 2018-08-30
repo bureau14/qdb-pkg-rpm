@@ -21,7 +21,7 @@ Source7:        ../qdb-server/qdbd_sysctl.conf
 # web-bridge sources
 Source8:        ../qdb-web-bridge/qdb_httpd_init.sh
 # api-rest sources
-Source9:        ../qdb-web-bridge/qdb_api_rest_init.sh
+Source9:        ../qdb-api-rest/qdb_api_rest_init.sh
 Provides:         libqdb_api.so()(64bit)
 Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
 Requires(postun): /usr/sbin/userdel
@@ -35,6 +35,7 @@ All quasardb tools
 %setup -c -T -D -a 1
 %setup -c -T -D -a 2
 %setup -c -T -D -a 3
+%setup -c -T -D -a 4
 
 
 %install
@@ -51,13 +52,15 @@ cp -R examples        %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
 rm -Rf examples
 
 # [server install]
-mkdir -p                              %{buildroot}%{_localstatedir}/lib/qdb
-mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb
-mkdir -p                              %{buildroot}%{_localstatedir}/share/qdb
+mkdir -p        %{buildroot}%{_localstatedir}/lib/qdb
+mkdir -p        %{buildroot}%{_localstatedir}/log/qdb
+mkdir -p        %{buildroot}%{_localstatedir}/share/qdb
+mv share/qdb/default.cfg  %{buildroot}%{_localstatedir}/share/qdb/.
 
 # /etc/qdb/
 mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
 touch                                 %{buildroot}%{_sysconfdir}/qdb/qdb_license.txt
+openssl req -newkey rsa:4096 -nodes -sha512 -x509 -days 3650 -nodes -out %{buildroot}%{_sysconfdir}/qdb/rest-api.cert.pem -keyout %{buildroot}%{_sysconfdir}/qdb/rest-api.key.pem -subj "/C=FR/L=Paris/O=Quasardb/CN=Quasardb" >/dev/null 2>&1
 
 mkdir -p                              %{buildroot}%{_initddir}
 cp          %{SOURCE5}                %{buildroot}%{_initddir}/qdbd
@@ -112,8 +115,6 @@ mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb_http
 # [web-bridge files]
 %attr(755, root, root)           %{_initddir}/qdb_httpd                   %config(noreplace)
 
-%{_datadir}/qdb/www
-
 
 # [api-rest files]
 %attr(755, root, root) %{_initddir}/qdb_api_rest                  %config(noreplace)
@@ -121,6 +122,9 @@ mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb_http
 %attr(640, qdb, qdb)   %{_sysconfdir}/qdb/rest-api.key.pem        %config(noreplace)
 %attr(640, qdb, qdb)   %{_localstatedir}/share/qdb/default.cfg    %config(noreplace)
 
+%{_datadir}/qdb
+%{_datadir}/share
+%{_datadir}/www
 
 
 %pre

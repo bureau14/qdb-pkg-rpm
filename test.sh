@@ -44,6 +44,10 @@ echo "##teamcity[testStarted name='server.install' captureStandardOutput='true']
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -i /mnt/$QDB_SERVER || echo "##teamcity[testFailed name='server.install' message='Failed to install server']"
 echo "##teamcity[testFinished name='server.install']"
 
+echo "##teamcity[testStarted name='server.add_user' captureStandardOutput='true']"
+sudo lxc-attach --clear-env -n $CONTAINER_NAME -- qdb_user_add -u tintin -s /var/share/qdb/tintin.private -p /etc/qdb/users.conf || echo "##teamcity[testFailed name='server.add_user' message='Failed to add user']"
+echo "##teamcity[testFinished name='server.add_user']"
+
 echo "##teamcity[testStarted name='utils.install' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -i /mnt/$QDB_UTILS || echo "##teamcity[testFailed name='utils.install' message='Failed to install utils']"
 echo "##teamcity[testFinished name='utils.install']"
@@ -85,7 +89,7 @@ sudo lxc-attach --clear-env -n $CONTAINER_NAME -- wget -qS http://127.0.0.1:8080
 echo "##teamcity[testFinished name='web-bridge.wget']"
 
 echo "##teamcity[testStarted name='qdb-api-rest.login' captureStandardOutput='true']"
-RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- curl -k -H 'Origin: http://0.0.0.0:3449'  -H 'Content-Type: application/json' -X POST --data-binary @/usr/share/qdb/tintin.private https://127.0.0.1:40000/api/login) || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Failed to login']"
+RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- curl -k -H 'Origin: http://0.0.0.0:3449'  -H 'Content-Type: application/json' -X POST --data-binary @/var/share/qdb/tintin.private https://127.0.0.1:40000/api/login) || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Failed to login']"
 WITHOUT_PREFIX=${RESULT#\"ey}
 [ WITHOUT_PREFIX != RESULT ] || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Invalid output from login']"
 echo "##teamcity[testFinished name='qdb-api-rest.login']"
@@ -161,7 +165,7 @@ sudo lxc-attach --clear-env -n $CONTAINER_NAME -- wget -qS http://127.0.0.1:8080
 echo "##teamcity[testFinished name='all.web-bridge.wget']"
 
 echo "##teamcity[testStarted name='qdb-api-rest.login' captureStandardOutput='true']"
-RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- curl -k -H 'Origin: http://0.0.0.0:3449'  -H 'Content-Type: application/json' -X POST --data-binary @/usr/share/qdb/tintin.private https://127.0.0.1:40000/api/login) || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Failed to login']"
+RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- curl -k -H 'Origin: http://0.0.0.0:3449'  -H 'Content-Type: application/json' -X POST --data-binary @/var/share/qdb/tintin.private https://127.0.0.1:40000/api/login) || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Failed to login']"
 WITHOUT_PREFIX=${RESULT#\"ey}
 [ WITHOUT_PREFIX != RESULT ] || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Invalid output from login']"
 echo "##teamcity[testFinished name='qdb-api-rest.login']"
@@ -186,11 +190,11 @@ echo "##teamcity[testStarted name='all.web-bridge.wget.after-reboot' captureStan
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- wget -qS http://127.0.0.1:8080 2>&1 || echo "##teamcity[testFailed name='all.web-bridge.wget.after-reboot' message='Failed to wget 127.0.0.1:8080']"
 echo "##teamcity[testFinished name='all.web-bridge.wget.after-reboot']"
 
-echo "##teamcity[testStarted name='qdb-api-rest.login' captureStandardOutput='true']"
-RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- curl -k -H 'Origin: http://0.0.0.0:3449'  -H 'Content-Type: application/json' -X POST --data-binary @/usr/share/qdb/tintin.private https://127.0.0.1:40000/api/login) || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Failed to login']"
+echo "##teamcity[testStarted name='qdb-api-rest.login.after-reboot' captureStandardOutput='true']"
+RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- curl -k -H 'Origin: http://0.0.0.0:3449'  -H 'Content-Type: application/json' -X POST --data-binary @/var/share/qdb/tintin.private https://127.0.0.1:40000/api/login) || echo "##teamcity[testFailed name='qdb-api-rest.login.after-reboot' message='Failed to login']"
 WITHOUT_PREFIX=${RESULT#\"ey}
-[ WITHOUT_PREFIX != RESULT ] || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Invalid output from login']"
-echo "##teamcity[testFinished name='qdb-api-rest.login']"
+[ WITHOUT_PREFIX != RESULT ] || echo "##teamcity[testFailed name='qdb-api-rest.login.after-reboot' message='Invalid output from login']"
+echo "##teamcity[testFinished name='qdb-api-rest.login.after-reboot']"
 
 echo "##teamcity[testStarted name='all.uninstall' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-all || echo "##teamcity[testFailed name='all.uninstall' message='Failed to uninstall God package']"
