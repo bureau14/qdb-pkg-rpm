@@ -50,7 +50,7 @@ esac
 
 %post
 if [ ! -e %{_sysconfdir}/qdb/qdb-api-rest.cfg ]; then
-    cp %{_localstatedir}/share/qdb/qdb-api-rest.cfg %{_sysconfdir}/qdb/qdb-api-rest.cfg
+    cp %{_localstatedir}/share/qdb/default.cfg %{_sysconfdir}/qdb/qdb-api-rest.cfg
     chown qdb:qdb %{_sysconfdir}/qdb/qdb-api-rest.cfg
     chmod 0600 %{_sysconfdir}/qdb/qdb-api-rest.cfg
 fi
