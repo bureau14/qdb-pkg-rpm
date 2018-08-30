@@ -4,10 +4,10 @@
 # Subsystem file for "quasardb" server
 #
 # chkconfig: 2345 60 40
-# description: quasardb server daemon
+# description: quasardb api rest
 #
 # processname: qdb_api_rest
-# config: /etc/qdb/qdb_api_rest.conf
+# config: /etc/qdb/qdb-api-rest.cfg
 # pidfile: /var/run/qdb/qdb_api_rest.pid
 
 # source function library
@@ -16,7 +16,7 @@
 RETVAL=0
 
 prog=qdb_api_rest
-exec=/usr/bin/qdb_api_rest
+exec=/usr/bin/qdb-api-rest-server
 pidfile=/var/run/qdb/qdb_api_rest.pid
 lockfile=/var/lock/subsys/qdb_api_rest
 
@@ -28,7 +28,7 @@ fi
 start() {
     echo -n $"Starting $prog:"
     mkdir -p /var/run/qdb
-    runuser qdb -g qdb -s /bin/sh -c '/usr/bin/qdb_api_rest --config-file /etc/qdb/qdb-api-rest.cfg &'
+    runuser qdb -g qdb -s /bin/sh -c '/usr/bin/qdb-api-rest-server --config-file /etc/qdb/qdb-api-rest.cfg  &'
     RETVAL=$?
     echo
     [ "$RETVAL" = 0 ] && touch $lockfile && /sbin/pidof $exec > $pidfile

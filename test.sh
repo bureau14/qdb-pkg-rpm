@@ -14,6 +14,7 @@ QDB_API=$(ls qdb-api/*.rpm)
 QDB_SERVER=$(ls qdb-server/*.rpm)
 QDB_UTILS=$(ls qdb-utils/*.rpm)
 QDB_HTTP=$(ls qdb-web-bridge/*.rpm)
+QDB_API_REST=$(ls qdb-api-rest/*.rpm)
 
 CONTAINER_CONFIG=test_container.conf
 cat >$CONTAINER_CONFIG <<END
@@ -32,6 +33,7 @@ sudo lxc-start -n $CONTAINER_NAME
 echo "Wait $DELAY seconds..."
 sleep $DELAY
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- yum install --nogpgcheck -y wget || echo "##teamcity[testFailed name='start' message='Failed to install wget']"
+sudo lxc-attach --clear-env -n $CONTAINER_NAME -- yum install --nogpgcheck -y curl || echo "##teamcity[testFailed name='start' message='Failed to install curl']"
 echo "##teamcity[testFinished name='start']"
 
 echo "##teamcity[testStarted name='api.install' captureStandardOutput='true']"
@@ -49,6 +51,18 @@ echo "##teamcity[testFinished name='utils.install']"
 echo "##teamcity[testStarted name='web-bridge.install' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -i /mnt/$QDB_HTTP || echo "##teamcity[testFailed name='web-bridge.install' message='Failed to install web-bridge']"
 echo "##teamcity[testFinished name='web-bridge.install']"
+
+echo "##teamcity[testStarted name='api-rest.install' captureStandardOutput='true']"
+sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -i /mnt/$QDB_API_REST || echo "##teamcity[testFailed name='api-rest.install' message='Failed to install api rest']"
+echo "##teamcity[testFinished name='api-rest.install']"
+
+echo "##teamcity[testStarted name='api-rest.set_allowed_origins' captureStandardOutput='true']"
+sudo lxc-attach --clear-env -n $CONTAINER_NAME -- sed -i -e 's|"allowed_origins":.*|"allowed_origins": ["http://0.0.0.0:3449"],|' /etc/qdb/qdb-api-rest.cfg || echo "##teamcity[testFailed name='api-rest.set_allowed_origins' message='Failed to set allowed origins api-rest']"
+echo "##teamcity[testFinished name='api-rest.set_allowed_origins']"
+
+echo "##teamcity[testStarted name='api-rest.restart' captureStandardOutput='true']"
+sudo lxc-attach --clear-env -n $CONTAINER_NAME -- service qdb_api_rest restart || echo "##teamcity[testFailed name='api-rest.restart' message='Failed to restart api-rest']"
+echo "##teamcity[testFinished name='api-rest.restart']"
 
 echo "Wait $DELAY seconds..."
 sleep $DELAY
@@ -69,6 +83,12 @@ echo "##teamcity[testFinished name='qdb-benchmark.put']"
 echo "##teamcity[testStarted name='web-bridge.wget' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- wget -qS http://127.0.0.1:8080 2>&1 || echo "##teamcity[testFailed name='web-bridge.wget' message='Failed to wget 127.0.0.1:8080']"
 echo "##teamcity[testFinished name='web-bridge.wget']"
+
+echo "##teamcity[testStarted name='qdb-api-rest.login' captureStandardOutput='true']"
+RESULT=$(sudo lxc-attach --clear-env -n $CONTAINER_NAME -- curl -k -H 'Origin: http://0.0.0.0:3449'  -H 'Content-Type: application/json' -X POST --data-binary @/usr/share/qdb/tintin.private https://127.0.0.1:40000/api/login) || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Failed to login']"
+WITHOUT_PREFIX=${RESULT#\"ey}
+[ WITHOUT_PREFIX != RESULT ] || echo "##teamcity[testFailed name='qdb-api-rest.login' message='Invalid output from login']"
+echo "##teamcity[testFinished name='qdb-api-rest.login']"
 
 echo "##teamcity[testStarted name='reboot' captureStandardOutput='true']"
 echo "Stop container..."
@@ -98,13 +118,17 @@ echo "##teamcity[testStarted name='utils.uninstall' captureStandardOutput='true'
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-utils || echo "##teamcity[testFailed name='utils.uninstall' message='Failed to uninstall utils']"
 echo "##teamcity[testFinished name='utils.uninstall']"
 
-echo "##teamcity[testStarted name='api.uninstall' captureStandardOutput='true']"
-sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-api || echo "##teamcity[testFailed name='api.uninstall' message='Failed to uninstall API']"
-echo "##teamcity[testFinished name='api.uninstall']"
-
 echo "##teamcity[testStarted name='web-bridge.uninstall' captureStandardOutput='true']"
 sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-web-bridge || echo "##teamcity[testFailed name='web-bridge.uninstall' message='Failed to uninstall web-bridge']"
 echo "##teamcity[testFinished name='web-bridge.uninstall']"
+
+echo "##teamcity[testStarted name='api-rest.uninstall' captureStandardOutput='true']"
+sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-api-rest || echo "##teamcity[testFailed name='api-rest.uninstall' message='Failed to uninstall api-rest']"
+echo "##teamcity[testFinished name='api-rest.uninstall']"
+
+echo "##teamcity[testStarted name='api.uninstall' captureStandardOutput='true']"
+sudo lxc-attach --clear-env -n $CONTAINER_NAME -- rpm -e qdb-api || echo "##teamcity[testFailed name='api.uninstall' message='Failed to uninstall API']"
+echo "##teamcity[testFinished name='api.uninstall']"
 
 
 # [ qdb-all tests] Need to be done separately to avoid conflicts

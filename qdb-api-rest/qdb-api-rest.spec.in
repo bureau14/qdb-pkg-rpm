@@ -36,14 +36,15 @@ cp          %{SOURCE1}     %{buildroot}%{_initddir}/qdb_api_rest
 
 %files
 %defattr(644,root,root,755)
-%attr(755, qdb, qdb)    %dir     %{_localstatedir}/share/qdb
-%attr(755, qdb, qdb)    %dir     %{_sysconfdir}/qdb
-%attr(755,root,root)    %{_bindir}/*
 
-%attr(755, root, root)           %{_initddir}/qdb_api_rest                  %config(noreplace)
-%attr(640, qdb, qdb)             %{_sysconfdir}/qdb/rest-api.cert.pem       %config(noreplace)
-%attr(640, qdb, qdb)             %{_sysconfdir}/qdb/rest-api.key.pem        %config(noreplace)
-%attr(640, qdb, qdb)             %{_localstatedir}/share/qdb/default.cfg    %config(noreplace)
+# %attr(755, qdb, qdb)    %dir     %{_sysconfdir}/qdb
+%attr(755, qdb, qdb)    %dir     %{_localstatedir}/share/qdb
+
+%attr(755,root,root)   %{_bindir}/*
+%attr(755, root, root) %{_initddir}/qdb_api_rest                  %config(noreplace)
+%attr(640, qdb, qdb)   %{_sysconfdir}/qdb/rest-api.cert.pem       %config(noreplace)
+%attr(640, qdb, qdb)   %{_sysconfdir}/qdb/rest-api.key.pem        %config(noreplace)
+%attr(640, qdb, qdb)   %{_localstatedir}/share/qdb/default.cfg    %config(noreplace)
 
 %pre
 case "$1" in
