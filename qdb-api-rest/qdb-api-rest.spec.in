@@ -1,0 +1,99 @@
+Summary:          quasardb is an advanced, distributed, high-performance key-value store
+Name:             $PACKAGE_NAME
+Version:          $PACKAGE_VERSION
+Release:          1
+License:          Proprietary
+Group:            Applications/Databases
+Vendor:           quasardb SAS
+Prefix:           /usr
+URL:              https://www.quasardb.net/
+BuildArch:        x86_64
+Source0:          $PACKAGE_TARBALL
+Source1:          qdb_api_rest_init.sh
+Requires:         qdb-api == $PACKAGE_VERSION
+Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
+Requires(postun): /usr/sbin/userdel
+
+%description
+quasardb api rest
+
+%prep
+%setup -c
+
+%install
+mkdir -p        %{buildroot}%{_bindir}
+cp bin/*        %{buildroot}%{_bindir}/
+
+mkdir -p        %{buildroot}%{_sysconfdir}/qdb
+openssl req -newkey rsa:4096 -nodes -sha512 -x509 -days 3650 -nodes -out %{buildroot}%{_sysconfdir}/qdb/rest-api.cert.pem -keyout %{buildroot}%{_sysconfdir}/qdb/rest-api.key.pem -subj "/C=FR/L=Paris/O=Quasardb/CN=Quasardb" >/dev/null 2>&1
+
+mkdir -p        %{buildroot}%{_localstatedir}/share/qdb
+cp share/qdb/*  %{buildroot}%{_localstatedir}/share/qdb/.
+
+# /etc/init/qdb_api_rest
+mkdir -p                   %{buildroot}%{_initddir}
+cp          %{SOURCE1}     %{buildroot}%{_initddir}/qdb_api_rest
+
+%files
+%defattr(644,root,root,755)
+
+# %attr(755, qdb, qdb)    %dir     %{_sysconfdir}/qdb
+%attr(755, qdb, qdb)    %dir     %{_localstatedir}/share/qdb
+
+%attr(755,root,root)   %{_bindir}/*
+%attr(755, root, root) %{_initddir}/qdb_api_rest                  %config(noreplace)
+%attr(640, qdb, qdb)   %{_sysconfdir}/qdb/rest-api.cert.pem       %config(noreplace)
+%attr(640, qdb, qdb)   %{_sysconfdir}/qdb/rest-api.key.pem        %config(noreplace)
+%attr(640, qdb, qdb)   %{_localstatedir}/share/qdb/default.cfg    %config(noreplace)
+
+%pre
+case "$1" in
+    1) # initial install
+        /usr/bin/getent group  qdb >/dev/null || /usr/sbin/groupadd -r -f qdb
+        /usr/bin/getent passwd qdb >/dev/null || /usr/sbin/useradd -g qdb -r -s /sbin/nologin qdb
+    ;;
+    2) # upgrade, do nothing
+      :
+    ;;
+esac
+
+%post
+if [ ! -e %{_sysconfdir}/qdb/qdb-api-rest.cfg ]; then
+    cp %{_localstatedir}/share/qdb/default.cfg %{_sysconfdir}/qdb/qdb-api-rest.cfg
+    chown qdb:qdb %{_sysconfdir}/qdb/qdb-api-rest.cfg
+    chmod 0600 %{_sysconfdir}/qdb/qdb-api-rest.cfg
+fi
+
+
+case "$1" in
+    1) # initial install
+        chkconfig --add qdb_api_rest
+        service qdb_api_rest start
+    ;;
+    2) # upgrade, just run the service
+        service qdb_api_rest start
+    ;;
+esac
+
+%preun
+case "$1" in
+    0) # uninstall
+        service qdb_api_rest stop
+        chkconfig --del qdb_api_rest
+    ;;
+    1) # upgrade, just stop the service
+        service qdb_api_rest stop
+    ;;
+esac
+
+%postun
+case "$1" in
+    0) # uninstall
+        if ! type qdb_api_rest &> /dev/null; then
+            /usr/sbin/userdel -f qdb
+        fi
+    ;;
+    1) # upgrade, do nothing
+      :
+    ;;
+esac

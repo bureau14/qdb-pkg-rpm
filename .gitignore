@@ -1,3 +1,5 @@
 *.spec
 *.rpm
 *.tar.gz
+build/
+test_container.conf
