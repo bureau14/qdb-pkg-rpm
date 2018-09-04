@@ -12,6 +12,10 @@ Source0:        $PACKAGE_TARBALL
 Source1:        qdbd_init.sh
 Source2:        qdbd_limits.conf
 Source3:        qdbd_sysctl.conf
+
+%{?systemd_requires}
+BuildRequires:    systemd
+
 Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
 Requires(postun): /usr/sbin/userdel
 
