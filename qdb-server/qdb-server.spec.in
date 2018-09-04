@@ -1,4 +1,4 @@
-Summary:        quasardb server
+Summary:        quasardb is an advanced, distributed, high-performance timeseries database
 Name:           $PACKAGE_NAME
 Version:        $PACKAGE_VERSION
 Release:        1
