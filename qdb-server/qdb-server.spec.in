@@ -91,8 +91,8 @@ bin/qdbd --gen-config --security=true \
 %pre
 getent group qdb >/dev/null || groupadd -r qdb
 getent passwd qdb >/dev/null || \
-useradd -r -g qdb -d %{_sharedstatedir}/qdb -s /sbin/nologin \
-        -c "QuasarDB Database Server" qdb
+    useradd -r -g qdb -d %{_sharedstatedir}/qdb -s /sbin/nologin \
+            -c "QuasarDB Database Server" qdb
 
 %post
 
