@@ -89,7 +89,7 @@ if [ ! -e %{_sysconfdir}/qdb/qdbsh_private.key ]; then
     chmod 0600 %{_sysconfdir}/qdb/qdbsh_private.key
 fi
 
-[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --security=true --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key --user-list=%{_sysconfdir}/qdb/users.conf --daemonize --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
+[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --security=true --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key --user-list=%{_sysconfdir}/qdb/users.conf --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
 
 case "$1" in
     1) # initial install
