@@ -1,4 +1,4 @@
-Summary:        quasardb is an advanced, distributed, high-performance timeseries database
+Summary:        quasardb server
 Name:           $PACKAGE_NAME
 Version:        $PACKAGE_VERSION
 Release:        1
@@ -9,122 +9,101 @@ Prefix:         /usr
 URL:            https://www.quasardb.net/
 BuildArch:      x86_64
 Source0:        $PACKAGE_TARBALL
-Source1:        qdbd_init.sh
+Source1:        qdbd.service
 Source2:        qdbd_limits.conf
 Source3:        qdbd_sysctl.conf
 
 %{?systemd_requires}
-BuildRequires:    systemd
+Requires:    systemd
 
 Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
-Requires(postun): /usr/sbin/userdel
+Requires(post):   systemd-units
+Requires(postun): systemd-units, /usr/sbin/userdel
 
 
 %description
-quasardb server
-
+quasardb is an advanced, distributed, high-performance timeseries database
 
 %prep
 %setup -c
 
-
 %install
-mkdir -p                              %{buildroot}%{_localstatedir}/lib/qdb
 
-mkdir -p                              %{buildroot}%{_localstatedir}/log/qdb
+## Qdb-specific directories
+mkdir -p                                       %{buildroot}%{_sysconfdir}/qdb/
+mkdir -p                                       %{buildroot}%{_sharedstatedir}/qdb
+mkdir -p                                       %{buildroot}%{_datarootdir}/qdb/
+mkdir -p                                       %{buildroot}%{_localstatedir}/log/qdb
 
-mkdir -p                              %{buildroot}%{_localstatedir}/share/qdb
+# Binaries
+install -p -D -m 755 bin/qdbd                  %{buildroot}%{_bindir}/qdbd
+install -p -D -m 755 bin/qdb_cluster_keygen    %{buildroot}%{_bindir}/qdb_cluster_keygen
+install -p -D -m 755 bin/qdb_dbtool            %{buildroot}%{_bindir}/qdb_dbtool
+install -p -D -m 755 bin/qdb_user_add          %{buildroot}%{_bindir}/qdb_user_add
 
-mkdir -p                              %{buildroot}%{_sysconfdir}/qdb
-touch                                 %{buildroot}%{_sysconfdir}/qdb/qdb_license.txt
+# Systemd installation
+install -p -D -m 644 %{SOURCE1}                %{buildroot}%{_unitdir}/qdbd.service
 
-mkdir -p                              %{buildroot}%{_initddir}
-cp          %{SOURCE1}                %{buildroot}%{_initddir}/qdbd
+# Seed the configuration files using the qdbd binary
+bin/qdb_cluster_keygen \
+    -s %{buildroot}%{_sysconfdir}/qdb/cluster_private.key \
+    -p %{buildroot}%{_datarootdir}/qdb/cluster_public.key
 
-#kdir -p                              %{buildroot}%{_sysconfdir}/security/limits.d/
-#p          %{SOURCE2}                %{buildroot}%{_sysconfdir}/security/limits.d/50-quasardb.conf   <----  doesn't work on a container
+bin/qdb_user_add  \
+    -u qdbsh \
+    -p %{buildroot}%{_sysconfdir}/qdb/users.conf \
+    -s %{buildroot}%{_sysconfdir}/qdb/qdbsh_private.key
 
-mkdir -p                              %{buildroot}%{_sysconfdir}/sysctl.d/
-cp          %{SOURCE3}                %{buildroot}%{_sysconfdir}/sysctl.d/30-quasardb.conf
 
-mkdir -p                              %{buildroot}%{_bindir}
-cp          bin/*                     %{buildroot}%{_bindir}
+bin/qdbd --gen-config --security=true \
+         --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key \
+         --user-list=%{_sysconfdir}/qdb/users.conf \
+         --log-directory=%{_localstatedir}/log/qdb \
+         --root=%{_sharedstatedir}/qdb \
+         > %{buildroot}%{_sysconfdir}/qdb/qdbd.conf
 
 
 %files
+%{_bindir}/qdbd
+%{_bindir}/qdb_cluster_keygen
+%{_bindir}/qdb_dbtool
+%{_bindir}/qdb_user_add
+
+%{_datarootdir}/qdb/cluster_public.key
+%{_sysconfdir}/qdb/cluster_private.key
+%{_sysconfdir}/qdb/qdbsh_private.key
+%{_sysconfdir}/qdb/users.conf
+%{_sysconfdir}/qdb/qdbd.conf
+%{_unitdir}/qdbd.service
+
 %defattr(644,root,root,755)
 
 %attr(755, root, root)  %dir     %{_sysconfdir}/qdb
-%attr(750, qdb, qdb)    %dir     %{_localstatedir}/lib/qdb
 %attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb
-%attr(755, qdb, qdb)    %dir     %{_localstatedir}/share/qdb
+%attr(750, qdb, qdb)    %dir     %{_sharedstatedir}/qdb
+%attr(750, qdb, qdb)    %dir     %{_sharedstatedir}/qdb
 
-%attr(755, root, root)           %{_bindir}/*
-%attr(755, root, root)           %{_initddir}/qdbd                        %config(noreplace)
-%attr(640, qdb, qdb)             %{_sysconfdir}/qdb/qdb_license.txt       %config(noreplace)
-%attr(644, root, root)           %{_sysconfdir}/sysctl.d/*                %config(noreplace)
-#%attr(644, root, root)           %{_sysconfdir}/security/limits.d/*       %config(noreplace)  <----  doesn't work on a container
+%attr(644, qdb, qdb)             %{_datarootdir}/qdb/cluster_public.key
+%attr(600, qdb, qdb)             %{_sysconfdir}/qdb/cluster_private.key
+%attr(600, qdb, qdb)             %{_sysconfdir}/qdb/qdbsh_private.key
+%attr(600, qdb, qdb)             %{_sysconfdir}/qdb/users.conf
 
 %pre
-case "$1" in
-    1) # initial install
-        /usr/bin/getent group  qdb >/dev/null || /usr/sbin/groupadd -r -f qdb
-        /usr/bin/getent passwd qdb >/dev/null || /usr/sbin/useradd -g qdb -r -s /sbin/nologin qdb
-    ;;
-    2) # upgrade, do nothing
-      :
-    ;;
-esac
+getent group qdb >/dev/null || groupadd -r qdb
+getent passwd qdb >/dev/null || \
+useradd -r -g qdb -d %{_sharedstatedir}/qdb -s /sbin/nologin \
+        -c "QuasarDB Database Server" qdb
 
 %post
-if [ ! -e %{_localstatedir}/share/qdb/cluster_public.key ]; then
-    %{_bindir}/qdb_cluster_keygen -s %{_sysconfdir}/qdb/cluster_private.key -p %{_localstatedir}/share/qdb/cluster_public.key
-    chown qdb:qdb %{_sysconfdir}/qdb/cluster_private.key
-    chmod 0600 %{_sysconfdir}/qdb/cluster_private.key
-    chown qdb:qdb %{_localstatedir}/share/qdb/cluster_public.key
-    chmod 0644 %{_localstatedir}/share/qdb/cluster_public.key
-fi
 
-if [ ! -e %{_sysconfdir}/qdb/qdbsh_private.key ]; then
-    %{_bindir}/qdb_user_add -u qdbsh -p %{_sysconfdir}/qdb/users.conf -s %{_sysconfdir}/qdb/qdbsh_private.key
-    chown qdb:qdb %{_sysconfdir}/qdb/users.conf
-    chmod 0600 %{_sysconfdir}/qdb/users.conf
-    chown qdb:qdb %{_sysconfdir}/qdb/qdbsh_private.key
-    chmod 0600 %{_sysconfdir}/qdb/qdbsh_private.key
-fi
+%systemd_post qdbd.service
 
-[ -e %{_sysconfdir}/qdb/qdbd.conf ] || %{_bindir}/qdbd --gen-config --security=true --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key --user-list=%{_sysconfdir}/qdb/users.conf --log-directory=%{_localstatedir}/log/qdb --root=%{_localstatedir}/lib/qdb > %{_sysconfdir}/qdb/qdbd.conf
-
-case "$1" in
-    1) # initial install
-        chkconfig --add qdbd
-        sysctl -e -q -p %{_sysconfdir}/sysctl.d/30-quasardb.conf 2>&1 || true
-        service qdbd start
-    ;;
-    2) # upgrade, just run the service
-        service qdbd start
-    ;;
-esac
+/bin/systemctl daemon-reload &> /dev/null || :
 
 %preun
-case "$1" in
-    0) # uninstall
-        service qdbd stop
-        chkconfig --del qdbd
-    ;;
-    1) # upgrade, just stop the service
-        service qdbd stop
-    ;;
-esac
+
+%systemd_preun qdbd.service
 
 %postun
-case "$1" in
-    0) # uninstall
-        if ! type qdb_httpd &> /dev/null  ; then
-            /usr/sbin/userdel -f qdb
-        fi
-    ;;
-    1) # upgrade, do nothing
-      :
-    ;;
-esac
+
+%systemd_postun_with_restart qdbd.service
