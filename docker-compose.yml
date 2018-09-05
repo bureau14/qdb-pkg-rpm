@@ -1,0 +1,25 @@
+version: '3.2'
+services:
+  qdb-server:
+    build: qdb-server/
+    image: bureau14/qdb-pkg-rpm/qdb-server
+    ports:
+      - "2836:2836"
+
+  qdb-api:
+    build: qdb-api/
+    image: bureau14/qdb-pkg-rpm/qdb-api
+
+  qdb-api-rest:
+    build: qdb-api-rest/
+    depends_on:
+      - "qdb-api"
+    image: bureau14/qdb-pkg-rpm/qdb-api-rest
+    ports:
+      - "40000:40000"
+
+  qdb-utils:
+    build: qdb-utils/
+    depends_on:
+      - "qdb-api"
+    image: bureau14/qdb-pkg-rpm/qdb-utils
