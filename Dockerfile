@@ -7,3 +7,4 @@ RUN yum update -y \
                       rpm \
                       rpm-build \
                       rpm-sign \
+    && yum clean all
