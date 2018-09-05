@@ -1,0 +1,14 @@
+[Unit]
+Description=QuasarDB REST API
+After=network.target
+ConditionPathExists=/etc/qdb/qdb_rest.conf
+
+[Service]
+Type=simple
+User=qdb
+Group=qdb
+ExecStart=/usr/bin/qdb_rest --config-file /etc/qdb/qdb_rest.conf
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

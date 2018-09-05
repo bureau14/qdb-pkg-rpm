@@ -1,0 +1,80 @@
+Summary:          REST API for QuasarDB
+Name:             $PACKAGE_NAME
+Version:          $PACKAGE_VERSION
+Release:          1
+License:          Proprietary
+Group:            Applications/Databases
+Vendor:           quasardb SAS
+Prefix:           /usr
+URL:              https://www.quasardb.net/
+BuildArch:        x86_64
+Source0:          $PACKAGE_TARBALL
+Source1:          qdb_rest.service
+
+%{?systemd_requires}
+BuildRequires:    systemd
+
+Requires:         qdb-api == $PACKAGE_VERSION
+Requires:         openssl
+Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
+Requires(post):   systemd-units
+Requires(postun): systemd-units, /usr/sbin/userdel
+
+%description
+REST API for QuasarDB, an advanced, distributed, high-performance timeseries database
+
+%prep
+%setup -c
+
+%install
+
+## Qdb-specific directories
+mkdir -p                                       %{buildroot}%{_sysconfdir}/qdb/
+
+# Binaries
+install -p -D -m 755 bin/qdb_rest              %{buildroot}%{_bindir}/qdb_rest
+install -p -D -m 755 etc/qdb_rest.conf.sample  %{buildroot}%{_sysconfdir}/qdb/qdb_rest.conf.default
+
+# Systemd installation
+install -p -D -m 644 %{SOURCE1}                %{buildroot}%{_unitdir}/qdb_rest.service
+
+# Generate some self-signed certificates out of the box
+openssl req \
+        -newkey rsa:4096 -nodes -sha512 -x509 -days 3650 -nodes \
+        -out %{buildroot}%{_sysconfdir}/qdb/qdb_rest.cert.pem \
+        -keyout %{buildroot}%{_sysconfdir}/qdb/qdb_rest.key.pem \
+        -subj "/C=FR/L=Paris/O=Quasardb/CN=Quasardb" \
+        > /dev/null 2>&1
+
+
+%files
+
+%{_bindir}/qdb_rest
+%{_unitdir}/qdb_rest.service
+%{_sysconfdir}/qdb/qdb_rest.conf.default
+%{_sysconfdir}/qdb/qdb_rest.cert.pem
+%{_sysconfdir}/qdb/qdb_rest.key.pem
+
+%defattr(644,root,root,755)
+
+%attr(600, qdb, qdb)   %{_sysconfdir}/qdb/qdb_rest.cert.pem       %config(noreplace)
+%attr(600, qdb, qdb)   %{_sysconfdir}/qdb/qdb_rest.key.pem        %config(noreplace)
+
+%pre
+getent group qdb >/dev/null || \
+    groupadd -r qdb
+
+getent passwd qdb >/dev/null || \
+    useradd -r -g qdb -d %{_sharedstatedir}/qdb -s /sbin/nologin \
+            -c "QuasarDB Database Server" qdb
+
+%post
+%systemd_post qdb_rest.service
+/bin/systemctl daemon-reload &> /dev/null || :
+
+%preun
+%systemd_preun qdb_rest.service
+
+
+%postun
+%systemd_postun_with_restart qdb_rest.service
