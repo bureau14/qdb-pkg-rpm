@@ -43,8 +43,8 @@ openssl req \
         -newkey rsa:4096 -nodes -sha512 -x509 -days 3650 -nodes \
         -out %{buildroot}%{_sysconfdir}/qdb/qdb_rest.cert.pem \
         -keyout %{buildroot}%{_sysconfdir}/qdb/qdb_rest.key.pem \
-        -subj "/C=FR/L=Paris/O=Quasardb/CN=Quasardb" \
-        > /dev/null 2>&1
+        -subj "/C=FR/L=Paris/O=Quasardb/CN=Quasardb"
+
 
 
 %files
