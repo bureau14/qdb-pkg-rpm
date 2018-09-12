@@ -13,13 +13,13 @@ services:
     links:
       - "qdb-server"
 
-  qdb-api-rest:
-    build: qdb-api-rest/
+  qdb-rest:
+    build: qdb-rest/
     depends_on:
       - "qdb-api"
     links:
       - "qdb-server"
-    image: bureau14/qdb-pkg-rpm/qdb-api-rest
+    image: bureau14/qdb-pkg-rpm/qdb-rest
     ports:
       - "40000:40000"
     privileged: true
