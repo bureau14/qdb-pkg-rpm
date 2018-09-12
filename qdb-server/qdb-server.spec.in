@@ -87,6 +87,7 @@ bin/qdbd --gen-config --security=true \
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/cluster_private.key
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/qdbsh_private.key
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/users.conf
+%attr(600, qdb, qdb)             %{_sysconfdir}/qdb/qdbd.conf
 
 %pre
 getent group qdb >/dev/null || groupadd -r qdb
