@@ -10,11 +10,15 @@ services:
   qdb-api:
     build: qdb-api/
     image: bureau14/qdb-pkg-rpm/qdb-api
+    links:
+      - "qdb-server"
 
   qdb-api-rest:
     build: qdb-api-rest/
     depends_on:
       - "qdb-api"
+    links:
+      - "qdb-server"
     image: bureau14/qdb-pkg-rpm/qdb-api-rest
     ports:
       - "40000:40000"
@@ -24,4 +28,6 @@ services:
     build: qdb-utils/
     depends_on:
       - "qdb-api"
+    links:
+      - "qdb-server"
     image: bureau14/qdb-pkg-rpm/qdb-utils
