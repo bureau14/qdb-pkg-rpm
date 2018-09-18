@@ -4,9 +4,25 @@
 
 FROM bureau14/qdb-pkg-rpm/qdb-api
 
-RUN yum install -y openssl \
+RUN yum update -y \
+    && yum install -y openssl \
+                      net-tools \
+                      wget \
     && yum clean all
+
+RUN wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && \
+    mv jq-linux64 /usr/local/bin/jq && \
+    chmod +x /usr/local/bin/jq
+
 
 COPY qdb_rest-*.rpm .
 RUN rpm -i qdb_rest-*.rpm
 RUN systemctl enable qdb_rest
+
+RUN cat /etc/qdb/qdb_rest.conf \
+    | jq ".allowed_origins = [\"http://0.0.0.0:3449\"]" \
+    | jq ".cluster_uri = \"qdb://qdb-server:2836\"" \
+    | jq ".tls_host = \"0.0.0.0\"" \
+    > /tmp/qdb_rest.conf.new && \
+    mv /tmp/qdb_rest.conf.new /etc/qdb/qdb_rest.conf && \
+    chown qdb:qdb /etc/qdb/qdb_rest.conf
