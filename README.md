@@ -28,5 +28,3 @@ To compile the quasardb packages, you need to has these installed:
 
 # Warning
 If you experience a problem while installing or upgrading after previously uninstalling an older version you can need to check the rights for the following files and folders. They should be `qdb:qdb`.
-- /etc/qdb/qdb_http_private.key
-- /var/log/qdb_http
