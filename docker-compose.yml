@@ -30,4 +30,5 @@ services:
       - "qdb-api"
     links:
       - "qdb-server"
+      - "qdb-rest"
     image: bureau14/qdb-pkg-rpm/qdb-utils
