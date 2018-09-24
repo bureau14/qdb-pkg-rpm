@@ -4,9 +4,10 @@ set -e
 
 SPEC_FILE=$1; shift
 PACKAGE_TARBALL=$1; shift
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 PACKAGE_NAME=$(basename "$SPEC_FILE" '.spec')
-PACKAGE_VERSION=$(echo "$PACKAGE_TARBALL" | sed -r 's/.*qdb-(.*)-linux-.*/\1/')
+PACKAGE_VERSION=$(${MYDIR}/get_version.sh ${PACKAGE_TARBALL})
 
 export PACKAGE_VERSION PACKAGE_NAME PACKAGE_TARBALL
 envsubst < "$SPEC_FILE.in" > "$SPEC_FILE"
