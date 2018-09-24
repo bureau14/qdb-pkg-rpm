@@ -1,0 +1,39 @@
+Summary:          Dashboard for QuasarDB
+Name:             $PACKAGE_NAME
+Version:          $PACKAGE_VERSION
+Release:          1
+License:          Proprietary
+Group:            Applications/Databases
+Vendor:           quasardb SAS
+Prefix:           /usr
+URL:              https://www.quasardb.net/
+BuildArch:        x86_64
+Source0:          $PACKAGE_TARBALL
+
+%{?systemd_requires}
+BuildRequires:    systemd
+
+Requires:         qdb_rest == $PACKAGE_VERSION
+
+%description
+Dashboard for QuasarDB, an advanced, distributed, high-performance timeseries database
+
+%prep
+%setup -c
+
+%install
+
+## Qdb-specific directories
+mkdir -p %{buildroot}%{_localstatedir}/lib/qdb/assets
+cp    -r * %{buildroot}%{_localstatedir}/lib/qdb/assets/
+
+%files
+%{_localstatedir}/lib/qdb/assets
+
+%post
+sed -i -e 's|"assets":.*|"assets": "'%{_localstatedir}/lib/qdb/assets/'/assets"' %{_sysconfdir}/qdb/qdb_rest.conf
+systemctl restart qdb_rest
+
+%postun
+sed -i -e 's|"assets":.*|"assets": ""' %{_sysconfdir}/qdb/qdb_rest.conf
+systemctl restart qdb_rest

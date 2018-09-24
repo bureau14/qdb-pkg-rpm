@@ -24,11 +24,21 @@ services:
       - "40000:40000"
     privileged: true
 
+  qdb-dashboard:
+    build: qdb-dashboard/
+    depends_on:
+      - "qdb-rest"
+    links:
+      - "qdb-server"
+    image: bureau14/qdb-pkg-rpm/qdb-dashboard
+    privileged: true
+
   qdb-utils:
     build: qdb-utils/
     depends_on:
       - "qdb-api"
     links:
       - "qdb-server"
+      - "qdb-dashboard"
       - "qdb-rest"
     image: bureau14/qdb-pkg-rpm/qdb-utils
