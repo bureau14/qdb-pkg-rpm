@@ -13,7 +13,7 @@ Source0:          $PACKAGE_TARBALL
 %{?systemd_requires}
 BuildRequires:    systemd
 
-Requires:         qdb-rest == $PACKAGE_VERSION
+Requires:         qdb-rest == $PACKAGE_VERSION-1
 
 %description
 Dashboard for QuasarDB, an advanced, distributed, high-performance timeseries database

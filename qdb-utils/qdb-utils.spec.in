@@ -9,7 +9,7 @@ Prefix:         /usr
 URL:            https://www.quasardb.net/
 BuildArch:      x86_64
 Source0:        $PACKAGE_TARBALL
-Requires:       qdb-api == $PACKAGE_VERSION
+Requires:       qdb-api == $PACKAGE_VERSION-1
 
 %description
 quasardb client utilities
