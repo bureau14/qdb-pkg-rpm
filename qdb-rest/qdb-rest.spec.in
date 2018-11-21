@@ -31,6 +31,8 @@ REST API for QuasarDB, an advanced, distributed, high-performance timeseries dat
 ## Qdb-specific directories
 mkdir -p                                       %{buildroot}%{_sysconfdir}/qdb/
 mkdir -p                                       %{buildroot}%{_localstatedir}/log/qdb
+mkdir -p %{buildroot}%{_localstatedir}/lib/qdb/assets
+cp    -r assets/* %{buildroot}%{_localstatedir}/lib/qdb/assets/
 
 # Binaries
 install -p -D -m 755 bin/qdb_rest              %{buildroot}%{_bindir}/qdb_rest
@@ -55,6 +57,7 @@ openssl req \
 %{_sysconfdir}/qdb/qdb_rest.conf
 %{_sysconfdir}/qdb/qdb_rest.cert.pem
 %{_sysconfdir}/qdb/qdb_rest.key.pem
+%{_localstatedir}/lib/qdb/assets
 
 %dir %{_localstatedir}/log/qdb
 
@@ -73,6 +76,7 @@ getent passwd qdb >/dev/null || \
             -c "QuasarDB Database Server" qdb
 
 %post
+sed -i -e 's|"assets":.*|"assets": "'%{_localstatedir}/lib/qdb/assets/'/assets"' %{_sysconfdir}/qdb/qdb_rest.conf
 %systemd_post qdb_rest.service
 /bin/systemctl daemon-reload &> /dev/null || :
 
