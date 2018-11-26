@@ -79,7 +79,7 @@ bin/qdbd --gen-config --security=true \
 %defattr(644,root,root,755)
 
 %attr(755, root, root)  %dir     %{_sysconfdir}/qdb
-%attr(750, qdb, qdb)    %dir     %{_localstatedir}/log/qdb
+%attr(755, qdb, qdb)    %dir     %{_localstatedir}/log/qdb
 %attr(750, qdb, qdb)    %dir     %{_sharedstatedir}/qdb
 %attr(750, qdb, qdb)    %dir     %{_sharedstatedir}/qdb
 
