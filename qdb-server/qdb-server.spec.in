@@ -59,7 +59,7 @@ bin/qdbd --gen-config --security=true \
          --cluster-private-file=%{_sysconfdir}/qdb/cluster_private.key \
          --user-list=%{_sysconfdir}/qdb/users.conf \
          --log-directory=%{_localstatedir}/log/qdb \
-         --root=%{_sharedstatedir}/qdb \
+         --rocksdb-root=%{_sharedstatedir}/qdb \
          > %{buildroot}%{_sysconfdir}/qdb/qdbd.conf
 
 
