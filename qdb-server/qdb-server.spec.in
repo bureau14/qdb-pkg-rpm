@@ -51,6 +51,9 @@ bin/qdb_cluster_keygen \
 
 bin/qdb_user_add  \
     -u qdbsh \
+    --uid=3 \
+    --superuser=0 \
+    --privileges=510 \
     -p %{buildroot}%{_sysconfdir}/qdb/users.conf \
     -s %{buildroot}%{_sysconfdir}/qdb/qdbsh_private.key
 
