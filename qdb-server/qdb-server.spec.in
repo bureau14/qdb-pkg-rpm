@@ -72,12 +72,13 @@ bin/qdbd --gen-config --security=true \
 %{_bindir}/qdb_dbtool
 %{_bindir}/qdb_user_add
 
-%{_datarootdir}/qdb/cluster_public.key
-%{_sysconfdir}/qdb/cluster_private.key
-%{_sysconfdir}/qdb/qdbsh_private.key
-%{_sysconfdir}/qdb/users.conf
-%{_sysconfdir}/qdb/qdbd.conf
-%{_unitdir}/qdbd.service
+
+%config(noreplace) %{_datarootdir}/qdb/cluster_public.key
+%config(noreplace) %{_sysconfdir}/qdb/cluster_private.key
+%config(noreplace) %{_sysconfdir}/qdb/qdbsh_private.key
+%config(noreplace) %{_sysconfdir}/qdb/users.conf
+%config(noreplace) %{_sysconfdir}/qdb/qdbd.conf
+%config %{_unitdir}/qdbd.service
 
 %defattr(644,root,root,755)
 
