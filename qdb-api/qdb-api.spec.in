@@ -42,5 +42,12 @@ cp -R examples        %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
 
 %post
 ldconfig
-ln -s -f %{_libdir}/libqdb_api.so.$PACKAGE_VERSION %{_libdir}/libqdb_api.so 
+
+rm -f %{_includedir}/qdb
+
+ln -s -f %{_libdir}/libqdb_api.so.$PACKAGE_VERSION %{_libdir}/libqdb_api.so
 ln -s -f %{_includedir}/qdb-$PACKAGE_VERSION       %{_includedir}/qdb
+
+%preun
+
+rm -f %{_includedir}/qdb
