@@ -8,6 +8,7 @@ HOSTNAME=$(hostname)
 IP=$(cat /etc/hosts | grep ${HOSTNAME} | ${AWK} '{print $1}')
 
 cat /etc/qdb/qdbd.conf \
+    | jq '.local.depot.rocksdb.max_open_files = 60000' \
     | jq ".local.network.listen_on = \"${IP}:2836\"" \
     | jq ".global.security.enabled = false" \
     | jq "del(.global.security.cluster_private_file)" \
