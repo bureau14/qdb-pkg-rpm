@@ -4,10 +4,17 @@ set -e
 
 SPEC_FILE=$1; shift
 PACKAGE_TARBALL=$1; shift
+
+if [[ $# == 3 ]]; then
+    PACKAGE_VERSION=$1; shift
+else
+    PACKAGE_VERSION=$(get_version ${PACKAGE_TARBALL})
+    echo "No package version provided. Setting PACKAGE_VERSION: ${PACKAGE_VERSION}"
+fi
+
 MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 PACKAGE_NAME=$(basename "$SPEC_FILE" '.spec')
-PACKAGE_VERSION=$(${MYDIR}/get_version.sh ${PACKAGE_TARBALL})
 
 export PACKAGE_VERSION PACKAGE_NAME PACKAGE_TARBALL
 envsubst < "$SPEC_FILE.in" > "$SPEC_FILE"
