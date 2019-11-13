@@ -5,4 +5,4 @@ PACKAGE_VERSION=$1; shift
 
 
 cd $(dirname $0)
-../common/pack.sh qdb-dashboard.spec $PACKAGE_TARBALL
+../common/pack.sh qdb-dashboard.spec $PACKAGE_TARBALL $PACKAGE_VERSION
