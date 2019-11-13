@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/bash -eu
 
 PACKAGE_TARBALL=$(readlink -e $1); shift
 PACKAGE_VERSION=$1; shift
