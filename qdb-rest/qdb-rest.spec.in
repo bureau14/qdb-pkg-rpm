@@ -1,7 +1,7 @@
 Summary:          REST API for QuasarDB
 Name:             $PACKAGE_NAME
 Version:          $PACKAGE_VERSION
-Release:          $PACKAGE_RELEASE
+Release:          1
 License:          Proprietary
 Group:            Applications/Databases
 Vendor:           quasardb SAS
@@ -14,7 +14,7 @@ Source1:          qdb_rest.service
 %{?systemd_requires}
 BuildRequires:    systemd
 
-Requires:         qdb-api == $PACKAGE_VERSION-$PACKAGE_RELEASE
+Requires:         qdb-api == $PACKAGE_VERSION-1
 Requires:         openssl
 Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
 Requires(post):   systemd-units

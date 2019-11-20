@@ -1,7 +1,7 @@
 Summary:        quasardb server
 Name:           $PACKAGE_NAME
 Version:        $PACKAGE_VERSION
-Release:        $PACKAGE_RELEASE
+Release:        1
 License:        Proprietary
 Group:          Applications/Databases
 Vendor:         quasardb SAS
