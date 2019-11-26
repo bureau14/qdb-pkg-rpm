@@ -1,7 +1,7 @@
 Summary:          Dashboard for QuasarDB
 Name:             $PACKAGE_NAME
 Version:          $PACKAGE_VERSION
-Release:          $PACKAGE_RELEASE
+Release:          1
 License:          Proprietary
 Group:            Applications/Databases
 Vendor:           quasardb SAS
@@ -13,7 +13,7 @@ Source0:          $PACKAGE_TARBALL
 %{?systemd_requires}
 BuildRequires:    systemd
 
-Requires:         qdb-rest == $PACKAGE_VERSION-$PACKAGE_RELEASE
+Requires:         qdb-rest == $PACKAGE_VERSION-1
 
 %description
 Dashboard for QuasarDB, an advanced, distributed, high-performance timeseries database

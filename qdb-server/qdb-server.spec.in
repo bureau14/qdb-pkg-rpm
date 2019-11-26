@@ -1,7 +1,7 @@
 Summary:        quasardb server
 Name:           $PACKAGE_NAME
 Version:        $PACKAGE_VERSION
-Release:        $PACKAGE_RELEASE
+Release:        1
 License:        Proprietary
 Group:          Applications/Databases
 Vendor:         quasardb SAS
@@ -38,7 +38,6 @@ mkdir -p                                       %{buildroot}%{_localstatedir}/log
 # Binaries
 install -p -D -m 755 bin/qdbd                  %{buildroot}%{_bindir}/qdbd
 install -p -D -m 755 bin/qdb_cluster_keygen    %{buildroot}%{_bindir}/qdb_cluster_keygen
-install -p -D -m 755 bin/qdb_dbtool            %{buildroot}%{_bindir}/qdb_dbtool
 install -p -D -m 755 bin/qdb_user_add          %{buildroot}%{_bindir}/qdb_user_add
 
 # Systemd installation
@@ -69,7 +68,6 @@ bin/qdbd --gen-config --security=true \
 %files
 %{_bindir}/qdbd
 %{_bindir}/qdb_cluster_keygen
-%{_bindir}/qdb_dbtool
 %{_bindir}/qdb_user_add
 
 
