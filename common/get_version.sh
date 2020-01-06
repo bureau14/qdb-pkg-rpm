@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-INPUT_VERSION=$1;shift
+VERSION="3.6.0~nightly"
 
-VERSION="${INPUT_VERSION}"
-
-if [[ "${INPUT_VERSION}" =~ ([0-9.]+)master ]]
+if [[ "${VERSION}" =~ ([0-9.]+)~nightly ]]
 then
     # Nightly
     DATE=$(date +'%Y%m%d')

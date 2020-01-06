@@ -4,11 +4,10 @@ set -eux
 
 SPEC_FILE=$1; shift
 PACKAGE_TARBALL=$1; shift
-PACKAGE_VERSION=$1; shift
 
 MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-PACKAGE_VERSION=$(${MYDIR}/get_version.sh ${PACKAGE_VERSION})
+PACKAGE_VERSION=$(${MYDIR}/get_version.sh)
 
 PACKAGE_NAME=$(basename "$SPEC_FILE" '.spec')
 
