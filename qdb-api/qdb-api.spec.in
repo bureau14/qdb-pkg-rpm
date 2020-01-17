@@ -30,24 +30,20 @@ cp lib/libqdb_api.so  %{buildroot}%{_libdir}/libqdb_api.so.$PACKAGE_VERSION
 mkdir -p              %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION
 cp -R examples        %{buildroot}%{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/
 
+ln -s -f %{_libdir}/libqdb_api.so.$PACKAGE_VERSION %{buildroot}%{_libdir}/libqdb_api.so
+ln -s -f %{_includedir}/qdb-$PACKAGE_VERSION       %{buildroot}%{_includedir}/qdb
+
 
 %files
 
 %defattr(644,root,root,755)
 
 %{_includedir}/qdb-$PACKAGE_VERSION/
+%{_includedir}/qdb
 %{_datadir}/$PACKAGE_NAME/$PACKAGE_VERSION/examples
 %attr(755, root, root) %{_libdir}/libqdb_api.so.$PACKAGE_VERSION
+%{_libdir}/libqdb_api.so
 
 
 %post
 ldconfig
-
-rm -f %{_includedir}/qdb
-
-ln -s -f %{_libdir}/libqdb_api.so.$PACKAGE_VERSION %{_libdir}/libqdb_api.so
-ln -s -f %{_includedir}/qdb-$PACKAGE_VERSION       %{_includedir}/qdb
-
-%preun
-
-rm -f %{_includedir}/qdb
