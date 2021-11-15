@@ -10,11 +10,11 @@ URL:            https://www.quasardb.net/
 BuildArch:      x86_64
 Source0:        $PACKAGE_TARBALL
 Source1:        qdbd.service
-Source2:        qdbd_limits.conf
-Source3:        qdbd_sysctl.conf
+Source2:        qdbd_sysctl.conf
+Source3:        qdbd_logrotate.conf
 
 %{?systemd_requires}
-Requires:    systemd
+Requires:       systemd, logrotate
 
 Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
 Requires(post):   systemd-units
@@ -35,13 +35,17 @@ mkdir -p                                       %{buildroot}%{_sharedstatedir}/qd
 mkdir -p                                       %{buildroot}%{_datarootdir}/qdb/
 mkdir -p                                       %{buildroot}%{_localstatedir}/log/qdb
 
-# Binaries
+# Binaries1
 install -p -D -m 755 bin/qdbd                  %{buildroot}%{_bindir}/qdbd
 install -p -D -m 755 bin/qdb_cluster_keygen    %{buildroot}%{_bindir}/qdb_cluster_keygen
 install -p -D -m 755 bin/qdb_user_add          %{buildroot}%{_bindir}/qdb_user_add
 
 # Systemd installation
 install -p -D -m 644 %{SOURCE1}                %{buildroot}%{_unitdir}/qdbd.service
+
+# Various copnfiguration files
+install -p -D -m 644 %{SOURCE2}                %{buildroot}/%{_sysconfdir}/sysctl.d/%{name}
+install -p -D -m 644 %{SOURCE3}                %{buildroot}/%{_sysconfdir}/logrotate.d/%{name}
 
 # Seed the configuration files using the qdbd binary
 bin/qdb_cluster_keygen \
@@ -69,7 +73,8 @@ bin/qdbd --gen-config --security=true \
 %{_bindir}/qdbd
 %{_bindir}/qdb_cluster_keygen
 %{_bindir}/qdb_user_add
-
+%{_sysconfdir}/logrotate.d/%{name}
+%{_sysconfdir}/sysctl.d/%{name}
 
 %config(noreplace) %{_datarootdir}/qdb/cluster_public.key
 %config(noreplace) %{_sysconfdir}/qdb/cluster_private.key
@@ -90,6 +95,9 @@ bin/qdbd --gen-config --security=true \
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/qdbsh_private.key
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/users.conf
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/qdbd.conf
+
+%attr(644, root, root)           %{_sysconfdir}/logrotate.d/%{name}
+%attr(644, root, root)           %{_sysconfdir}/sysctl.d/%{name}
 
 %pre
 getent group qdb >/dev/null || groupadd -r qdb
