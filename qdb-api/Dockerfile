@@ -5,4 +5,4 @@
 FROM centos/systemd
 
 COPY qdb-api-*.rpm .
-RUN rpm -i qdb-api-*.rpm
+RUN yum install -y qdb-api-*.rpm

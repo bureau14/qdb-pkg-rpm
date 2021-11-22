@@ -16,7 +16,7 @@ RUN wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && \
 
 
 COPY qdb-rest-*.rpm .
-RUN rpm -i qdb-rest-*.rpm
+RUN yum install -y qdb-rest-*.rpm
 RUN systemctl enable qdb_rest
 
 RUN cat /etc/qdb/qdb_rest.conf \
