@@ -7,4 +7,4 @@ FROM bureau14/qdb-pkg-rpm/qdb-api
 RUN yum install -y curl
 
 COPY qdb-utils-*.rpm .
-RUN rpm -i qdb-utils-*.rpm
+RUN yum install -y qdb-utils-*.rpm

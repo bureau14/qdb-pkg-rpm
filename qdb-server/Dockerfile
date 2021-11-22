@@ -16,7 +16,7 @@ RUN wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && \
     chmod +x /usr/local/bin/jq
 
 COPY qdb-server-*.rpm .
-RUN rpm -i qdb-server-*.rpm
+RUN yum install -y qdb-server-*.rpm
 RUN systemctl enable qdbd
 
 
