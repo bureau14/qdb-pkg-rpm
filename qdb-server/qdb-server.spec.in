@@ -68,6 +68,7 @@ bin/qdbd --gen-config --security=true \
          --rocksdb-root=%{_sharedstatedir}/qdb \
          > %{buildroot}%{_sysconfdir}/qdb/qdbd.conf
 
+touch %{buildroot}%{_sysconfdir}/qdb/qdbd.env
 
 %files
 %{_bindir}/qdbd
