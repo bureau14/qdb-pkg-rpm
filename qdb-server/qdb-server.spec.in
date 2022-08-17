@@ -96,6 +96,7 @@ touch %{buildroot}%{_sysconfdir}/qdb/qdbd.env
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/qdbsh_private.key
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/users.conf
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/qdbd.conf
+%attr(600, qdb, qdb)             %{_sysconfdir}/qdb/qdbd.env
 
 %attr(644, root, root)           %{_sysconfdir}/logrotate.d/%{name}
 %attr(644, root, root)           %{_sysconfdir}/sysctl.d/%{name}
