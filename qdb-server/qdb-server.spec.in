@@ -20,6 +20,8 @@ Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
 Requires(post):   systemd-units
 Requires(postun): systemd-units, /usr/sbin/userdel
 
+%debug_package
+%undefine _missing_build_ids_terminate_build
 
 %description
 quasardb is an advanced, distributed, high-performance timeseries database
