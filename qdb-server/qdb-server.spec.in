@@ -63,7 +63,7 @@ bin/qdb_user_add  \
     -s %{buildroot}%{_sysconfdir}/qdb/qdbsh_private.key
 
 bin/qdb_user_add  \
-    -u qdbsh \
+    -u qdb_rest \
     --uid=4 \
     --superuser=0 \
     --privileges=16894 \
