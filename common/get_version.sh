@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="3.14.0~nightly"
+VERSION="3.14.1~nightly"
 
 if [[ "${VERSION}" =~ ([0-9.]+)~nightly ]]
 then
