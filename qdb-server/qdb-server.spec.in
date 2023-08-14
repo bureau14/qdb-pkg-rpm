@@ -92,7 +92,7 @@ touch %{buildroot}%{_sysconfdir}/qdb/qdbd.env
 %config(noreplace) %{_sysconfdir}/qdb/qdb_rest_private.key
 %config(noreplace) %{_sysconfdir}/qdb/users.conf
 %config(noreplace) %{_sysconfdir}/qdb/qdbd.conf
-%config %{_unitdir}/qdbd.service
+%config /usr/lib/systemd/system/qdbd.service
 
 %defattr(644,root,root,755)
 
