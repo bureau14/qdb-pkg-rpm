@@ -43,7 +43,7 @@ install -p -D -m 755 bin/qdb_cluster_keygen    %{buildroot}%{_bindir}/qdb_cluste
 install -p -D -m 755 bin/qdb_user_add          %{buildroot}%{_bindir}/qdb_user_add
 
 # Systemd installation
-install -p -D -m 644 %{SOURCE1}                %{buildroot}%{_unitdir}/qdbd.service
+install -p -D -m 644 %{SOURCE1}                %{buildroot}/%{_unitdir}/qdbd.service
 
 # Various copnfiguration files
 install -p -D -m 644 %{SOURCE2}                %{buildroot}/%{_sysconfdir}/sysctl.d/%{name}
