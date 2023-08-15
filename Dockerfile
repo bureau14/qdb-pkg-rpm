@@ -1,4 +1,4 @@
-FROM docker.io/amazonlinux:latest
+FROM docker.io/amazonlinux:2
 
 RUN yum install -y gettext \
                    openssl \
