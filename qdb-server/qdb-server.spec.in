@@ -7,7 +7,7 @@ Group:          Applications/Databases
 Vendor:         quasardb SAS
 Prefix:         /usr
 URL:            https://www.quasardb.net/
-BuildArch:      x86_64
+BuildArch:      $PACKAGE_ARCH
 Source0:        $PACKAGE_TARBALL
 Source1:        qdbd.service
 Source2:        qdbd_sysctl.conf
@@ -43,7 +43,7 @@ install -p -D -m 755 bin/qdb_cluster_keygen    %{buildroot}%{_bindir}/qdb_cluste
 install -p -D -m 755 bin/qdb_user_add          %{buildroot}%{_bindir}/qdb_user_add
 
 # Systemd installation
-install -p -D -m 644 %{SOURCE1}                %{buildroot}%{_unitdir}/qdbd.service
+install -p -D -m 644 %{SOURCE1}                %{buildroot}/usr/lib/systemd/system/qdbd.service
 
 # Various copnfiguration files
 install -p -D -m 644 %{SOURCE2}                %{buildroot}/%{_sysconfdir}/sysctl.d/%{name}
@@ -92,7 +92,7 @@ touch %{buildroot}%{_sysconfdir}/qdb/qdbd.env
 %config(noreplace) %{_sysconfdir}/qdb/qdb_rest_private.key
 %config(noreplace) %{_sysconfdir}/qdb/users.conf
 %config(noreplace) %{_sysconfdir}/qdb/qdbd.conf
-%config %{_unitdir}/qdbd.service
+%config /usr/lib/systemd/system/qdbd.service
 
 %defattr(644,root,root,755)
 
