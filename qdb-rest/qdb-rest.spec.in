@@ -10,9 +10,11 @@ URL:              https://www.quasardb.net/
 BuildArch:        $PACKAGE_ARCH
 Source0:          $PACKAGE_TARBALL
 Source1:          qdb_rest.service
+Source2:          qdb_rest_logrotate.conf
 
 %{?systemd_requires}
 BuildRequires:    systemd
+Requires:         logrotate
 
 Requires:         qdb-api == $PACKAGE_VERSION-1
 Requires:         openssl
@@ -38,6 +40,7 @@ install -p -D -m 755 etc/qdb_rest.conf.sample  %{buildroot}%{_sysconfdir}/qdb/qd
 
 # Systemd installation
 install -p -D -m 644 %{SOURCE1}                %{buildroot}%{_unitdir}/qdb_rest.service
+install -p -D -m 644 %{SOURCE2}                %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
 # Generate some self-signed certificates out of the box
 openssl req \
@@ -55,6 +58,7 @@ openssl req \
 %{_sysconfdir}/qdb/qdb_rest.conf
 %{_sysconfdir}/qdb/qdb_rest.cert.pem
 %{_sysconfdir}/qdb/qdb_rest.key.pem
+%{_sysconfdir}/logrotate.d/%{name}
 
 %dir %{_localstatedir}/log/qdb
 
@@ -63,6 +67,8 @@ openssl req \
 %attr(755, qdb, qdb)   %{_localstatedir}/log/qdb                  %config(noreplace)
 %attr(600, qdb, qdb)   %{_sysconfdir}/qdb/qdb_rest.cert.pem       %config(noreplace)
 %attr(600, qdb, qdb)   %{_sysconfdir}/qdb/qdb_rest.key.pem        %config(noreplace)
+
+%attr(644, root, root) %{_sysconfdir}/logrotate.d/%{name}
 
 %pre
 getent group qdb >/dev/null || \
