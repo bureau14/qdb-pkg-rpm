@@ -11,8 +11,9 @@ Group=qdb
 EnvironmentFile=/etc/qdb/qdbd.env
 ExecStart=/usr/bin/qdbd -c /etc/qdb/qdbd.conf
 Restart=on-failure
-LimitNOFILE=131072
 TimeoutStopSec=0
+LimitNOFILE=262144
+LimitCORE=infinity
 
 [Install]
 WantedBy=multi-user.target
