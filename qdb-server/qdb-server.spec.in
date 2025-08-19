@@ -12,6 +12,7 @@ Source0:        $PACKAGE_TARBALL
 Source1:        qdbd.service
 Source2:        qdbd_sysctl.conf
 Source3:        qdbd_logrotate.conf
+Source4:        qdbd_tmpfiles.conf
 
 %{?systemd_requires}
 Requires:       systemd, logrotate
@@ -48,6 +49,7 @@ install -p -D -m 644 %{SOURCE1}                %{buildroot}/usr/lib/systemd/syst
 # Various copnfiguration files
 install -p -D -m 644 %{SOURCE2}                %{buildroot}/%{_sysconfdir}/sysctl.d/%{name}
 install -p -D -m 644 %{SOURCE3}                %{buildroot}/%{_sysconfdir}/logrotate.d/%{name}
+install -p -D -m 644 %{SOURCE4}                %{buildroot}/%{_sysconfdir}/tmpfiles.d/%{name}.conf
 
 # Seed the configuration files using the qdbd binary
 bin/qdb_cluster_keygen \
@@ -85,6 +87,7 @@ touch %{buildroot}%{_sysconfdir}/qdb/qdbd.env
 %{_bindir}/qdb_user_add
 %{_sysconfdir}/logrotate.d/%{name}
 %{_sysconfdir}/sysctl.d/%{name}
+%{_sysconfdir}/tmpfiles.d/%{name}.conf
 
 %config(noreplace) %{_datarootdir}/qdb/cluster_public.key
 %config(noreplace) %{_sysconfdir}/qdb/cluster_private.key
@@ -111,6 +114,7 @@ touch %{buildroot}%{_sysconfdir}/qdb/qdbd.env
 
 %attr(644, root, root)           %{_sysconfdir}/logrotate.d/%{name}
 %attr(644, root, root)           %{_sysconfdir}/sysctl.d/%{name}
+%attr(644, root, root)           %{_sysconfdir}/tmpfiles.d/%{name}.conf
 
 %pre
 getent group qdb >/dev/null || groupadd -r qdb

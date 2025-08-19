@@ -7,4 +7,5 @@ cd $(dirname $0)
                   $PACKAGE_TARBALL \
                   qdbd.service \
                   qdbd_sysctl.conf \
-                  qdbd_logrotate.conf
+                  qdbd_logrotate.conf \
+                  qdbd_tmpfiles.conf
