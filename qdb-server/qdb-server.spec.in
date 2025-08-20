@@ -47,7 +47,7 @@ install -p -D -m 755 bin/qdb_user_add          %{buildroot}%{_bindir}/qdb_user_a
 install -p -D -m 644 %{SOURCE1}                %{buildroot}/usr/lib/systemd/system/qdbd.service
 
 # Various copnfiguration files
-install -p -D -m 644 %{SOURCE2}                %{buildroot}/%{_sysconfdir}/sysctl.d/%{name}
+install -p -D -m 644 %{SOURCE2}                %{buildroot}/%{_sysconfdir}/sysctl.d/99-%{name}.conf
 install -p -D -m 644 %{SOURCE3}                %{buildroot}/%{_sysconfdir}/logrotate.d/%{name}
 install -p -D -m 644 %{SOURCE4}                %{buildroot}/%{_sysconfdir}/tmpfiles.d/%{name}.conf
 
@@ -86,8 +86,8 @@ touch %{buildroot}%{_sysconfdir}/qdb/qdbd.env
 %{_bindir}/qdb_cluster_keygen
 %{_bindir}/qdb_user_add
 %{_sysconfdir}/logrotate.d/%{name}
-%{_sysconfdir}/sysctl.d/%{name}
 %{_sysconfdir}/tmpfiles.d/%{name}.conf
+%{_sysconfdir}/sysctl.d/99-%{name}.conf
 
 %config(noreplace) %{_datarootdir}/qdb/cluster_public.key
 %config(noreplace) %{_sysconfdir}/qdb/cluster_private.key
@@ -102,7 +102,6 @@ touch %{buildroot}%{_sysconfdir}/qdb/qdbd.env
 %attr(755, root, root)  %dir     %{_sysconfdir}/qdb
 %attr(755, qdb, qdb)    %dir     %{_localstatedir}/log/qdb
 %attr(750, qdb, qdb)    %dir     %{_sharedstatedir}/qdb
-%attr(750, qdb, qdb)    %dir     %{_sharedstatedir}/qdb
 
 %attr(644, qdb, qdb)             %{_datarootdir}/qdb/cluster_public.key
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/cluster_private.key
@@ -113,8 +112,8 @@ touch %{buildroot}%{_sysconfdir}/qdb/qdbd.env
 %attr(600, qdb, qdb)             %{_sysconfdir}/qdb/qdbd.env
 
 %attr(644, root, root)           %{_sysconfdir}/logrotate.d/%{name}
-%attr(644, root, root)           %{_sysconfdir}/sysctl.d/%{name}
 %attr(644, root, root)           %{_sysconfdir}/tmpfiles.d/%{name}.conf
+%attr(644, root, root)           %{_sysconfdir}/sysctl.d/99-%{name}.conf
 
 %pre
 getent group qdb >/dev/null || groupadd -r qdb
