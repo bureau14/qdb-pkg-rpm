@@ -34,7 +34,7 @@ To compile the quasardb packages, you need to has these installed:
 3. Download code-signing and put it in the root of the repo (qdb-pkg-rpm/code-signing)
 4. Run Docker
     ```
-    docker run -v ${PWD}/work -ti docker.io/bureau14/qdb-pkg-rpm:latest
+    docker run -v ${PWD}:/work -ti docker.io/bureau14/qdb-pkg-rpm:latest
     ```
 5. Go to the component you want to build and run pack.sh
     ```
