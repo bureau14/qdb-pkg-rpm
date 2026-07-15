@@ -104,6 +104,11 @@ def generate_pipeline() -> Pipeline:
                 "download": {
                     "git-ref": git_ref,
                     "variant": dependency_slug,
+                    "by_project": {
+                        "qdb-code-signin": {
+                            "variant": "build"
+                        }
+                    }
                 },
                 "upload": {"variant": slug, "git-ref": git_ref},
                 "promote": {"variant": slug, "git-ref": git_ref},
