@@ -21,4 +21,5 @@ USER $USERNAME
 
 RUN mkdir -p ~/.gnupg/ \
 && echo "allow-preset-passphrase" >> ~/.gnupg/gpg-agent.conf \
-&& chmod -R 600 ~/.gnupg/
+&& chmod 700 ~/.gnupg/ \
+&& chmod 600 ~/.gnupg/gpg-agent.conf
