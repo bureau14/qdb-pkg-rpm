@@ -92,6 +92,7 @@ def generate_pipeline() -> Pipeline:
             tvars = {
                 "slug": slug,
                 "name": slug.replace("-", " ").title(),
+                "queue": p.queue("default")
             }
 
             compose_config = {

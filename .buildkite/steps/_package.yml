@@ -1,5 +1,5 @@
 agents:
-  queue: "default-debian-amd64"
+  queue: "{queue}"
 
 label: "{name}"
 key: "{slug}"
