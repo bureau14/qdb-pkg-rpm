@@ -105,7 +105,7 @@ def generate_pipeline() -> Pipeline:
                     "git-ref": git_ref,
                     "variant": dependency_slug,
                     "by_project": {
-                        "qdb-code-signin": {
+                        "qdb-code-signing": {
                             "variant": "build"
                         }
                     }

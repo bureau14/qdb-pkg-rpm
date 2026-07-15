@@ -20,7 +20,7 @@ plugins:
             files:
               - "*.tar.gz"
             output-dir: artifacts
-          - project_id: "qdb-code-signin"
+          - project_id: "qdb-code-signing"
             files:
               - "qdb-code-signing.tar.gz!*"
             output-dir: qdb-code-signing
