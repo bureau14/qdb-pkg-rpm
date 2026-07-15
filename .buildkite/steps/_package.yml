@@ -9,6 +9,7 @@ commands:
   - bash qdb-server/pack.sh artifacts/*-server.tar.gz
   - bash qdb-utils/pack.sh artifacts/*-utils.tar.gz
   - bash qdb-rest/pack.sh artifacts/*-rest.tar.gz
+  - bash qdb-code-signing/rpmsign.sh $(find . -name '*.rpm')
 
 plugins:
   - bureau14/qdb-artifacts#master:
