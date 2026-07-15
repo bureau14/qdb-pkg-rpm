@@ -22,7 +22,8 @@ plugins:
             output-dir: artifacts
           - project_id: "qdb-code-signing"
             files:
-              - "qdb-code-signing.tar.gz!*"
+              - "qdb-code-signing.tar.gz"
+            extract: true
             output-dir: qdb-code-signing
       upload:
         files:
