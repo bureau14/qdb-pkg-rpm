@@ -33,17 +33,10 @@ from qdb_pipeline import (
 STEPS_DIR = Path(__file__).parent / "steps"
 
 # Quasardb-specific toolchain overlays on top of shared infrastructure platforms.
-_LINUX = dict(
-    c_compiler="$$QDB_CICD_AGENT_CC",
-    cxx_compiler="$$QDB_CICD_AGENT_CXX",
-    asm_compiler="$$QDB_CICD_AGENT_YASM",
-    docker_image="bureau14/builder:rhel7",
-)
-_WIN = dict(
-    asm_compiler="$$QDB_CICD_AGENT_YASM",
-)
+_LINUX = dict()
 
-_OS_OVERLAY = {"linux": _LINUX, "windows": _WIN}
+
+_OS_OVERLAY = {"linux": _LINUX}
 PLATFORMS: list[Platform] = [
     dataclasses.replace(p, **_OS_OVERLAY.get(p.os, {}))
     for p in select_platforms("linux-amd64-haswell", "linux-aarch64")
@@ -72,7 +65,6 @@ def _env(p: Platform, step_name: str, build_type: str) -> dict[str, str]:
         OS_ENV.get(p.os, {}),
         OS_STEP_ENV.get(f"{p.os}/{step_name}", {}),
         CPU_ENV.get(p.cpu, {}),
-        {"CMAKE_BUILD_TYPE": build_type},
         platform=p,
     )
 
@@ -92,7 +84,7 @@ def generate_pipeline() -> Pipeline:
             tvars = {
                 "slug": slug,
                 "name": slug.replace("-", " ").title(),
-                "queue": p.queue("default")
+                "queue": p.queue("default"),
             }
 
             compose_config = {
@@ -105,11 +97,7 @@ def generate_pipeline() -> Pipeline:
                 "download": {
                     "git-ref": git_ref,
                     "variant": dependency_slug,
-                    "by_project": {
-                        "qdb-code-signing": {
-                            "variant": "build"
-                        }
-                    }
+                    "by_project": {"qdb-code-signing": {"variant": "build"}},
                 },
                 "upload": {"variant": slug, "git-ref": git_ref},
                 "promote": {"variant": slug, "git-ref": git_ref},
