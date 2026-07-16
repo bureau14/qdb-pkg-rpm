@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Buildkite dynamic pipeline generator for qdb-api-go.
+"""Buildkite dynamic pipeline generator for qdb-pkg-rpm.
 
 Step templates in steps/*.yml define nearly-complete Buildkite steps with
 {placeholder} variables.  This script loads them, substitutes variables, and
@@ -86,7 +86,7 @@ def generate_pipeline() -> Pipeline:
         for bt in BUILD_TYPES:
             dependency_slug = p.slug(bt.lower())
             slug = p.slug(bt.lower())
-            # We want to use Release QuasarDB binaries when building Go API (debug and release)
+            # We want to use Release QuasarDB binaries
             dependency_slug = p.slug("release")
 
             tvars = {
