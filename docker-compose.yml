@@ -22,22 +22,12 @@ services:
 
   qdb-rest:
     build: qdb-rest/
-    depends_on:
-      - "qdb-api"
     links:
       - "qdb-server"
     image: bureau14/qdb-pkg-rpm/qdb-rest
     ports:
-      - "40000:40000"
-    privileged: true
-
-  qdb-dashboard:
-    build: qdb-dashboard/
-    depends_on:
-      - "qdb-rest"
-    links:
-      - "qdb-server"
-    image: bureau14/qdb-pkg-rpm/qdb-dashboard
+      - "40080:40080"
+      - "40443:40443"
     privileged: true
 
   qdb-utils:
@@ -46,6 +36,5 @@ services:
       - "qdb-api"
     links:
       - "qdb-server"
-      - "qdb-dashboard"
       - "qdb-rest"
     image: bureau14/qdb-pkg-rpm/qdb-utils

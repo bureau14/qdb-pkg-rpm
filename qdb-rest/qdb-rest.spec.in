@@ -10,17 +10,20 @@ URL:              https://www.quasardb.net/
 BuildArch:        $PACKAGE_ARCH
 Source0:          $PACKAGE_TARBALL
 Source1:          qdb_rest.service
-Source2:          qdb_rest_logrotate.conf
 
 %{?systemd_requires}
 BuildRequires:    systemd
-Requires:         logrotate
 
-Requires:         qdb-api == $PACKAGE_VERSION-1
-Requires:         openssl
 Requires(pre):    /usr/sbin/useradd, /usr/sbin/groupadd
 Requires(post):   systemd-units
-Requires(postun): systemd-units, /usr/sbin/userdel
+Requires(postun): systemd-units
+
+# keep_file gives a file a second name, and restore_file gives the file its
+# own name back when rpm removed it. They are rpm macros because
+# common/pack.sh runs envsubst over this file, which empties every shell
+# variable a scriptlet would use.
+%define keep_file()    [ ! -f %{1} ] || ln -f %{1} %{1}.keep
+%define restore_file() [ ! -f %{1}.keep ] || { [ -f %{1} ] || ln %{1}.keep %{1}; rm -f %{1}.keep; }
 
 %description
 REST API for QuasarDB, an advanced, distributed, high-performance timeseries database
@@ -30,45 +33,21 @@ REST API for QuasarDB, an advanced, distributed, high-performance timeseries dat
 
 %install
 
-## Qdb-specific directories
-mkdir -p                                       %{buildroot}%{_sysconfdir}/qdb/
-mkdir -p                                       %{buildroot}%{_localstatedir}/log/qdb
-
-# Binaries
+# The archive holds bin/qdb_rest and etc/qdb_rest.yaml.
 install -p -D -m 755 bin/qdb_rest              %{buildroot}%{_bindir}/qdb_rest
-install -p -D -m 755 etc/qdb_rest.conf.sample  %{buildroot}%{_sysconfdir}/qdb/qdb_rest.conf
+install -p -D -m 644 etc/qdb_rest.yaml         %{buildroot}%{_sysconfdir}/qdb/qdb_rest.yaml
 
 # Systemd installation
 install -p -D -m 644 %{SOURCE1}                %{buildroot}%{_unitdir}/qdb_rest.service
-install -p -D -m 644 %{SOURCE2}                %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
-
-# Generate some self-signed certificates out of the box
-openssl req \
-        -newkey rsa:4096 -nodes -sha512 -x509 -days 3650 -nodes \
-        -out %{buildroot}%{_sysconfdir}/qdb/qdb_rest.cert.pem \
-        -keyout %{buildroot}%{_sysconfdir}/qdb/qdb_rest.key.pem \
-        -subj "/C=FR/L=Paris/O=Quasardb/CN=Quasardb"
-
 
 
 %files
 
-%{_bindir}/qdb_rest
-%{_unitdir}/qdb_rest.service
-%{_sysconfdir}/qdb/qdb_rest.conf
-%{_sysconfdir}/qdb/qdb_rest.cert.pem
-%{_sysconfdir}/qdb/qdb_rest.key.pem
-%{_sysconfdir}/logrotate.d/%{name}
-
-%dir %{_localstatedir}/log/qdb
-
 %defattr(644,root,root,755)
 
-%attr(755, qdb, qdb)   %{_localstatedir}/log/qdb                  %config(noreplace)
-%attr(600, qdb, qdb)   %{_sysconfdir}/qdb/qdb_rest.cert.pem       %config(noreplace)
-%attr(600, qdb, qdb)   %{_sysconfdir}/qdb/qdb_rest.key.pem        %config(noreplace)
-
-%attr(644, root, root) %{_sysconfdir}/logrotate.d/%{name}
+%attr(755, root, root) %{_bindir}/qdb_rest
+%{_unitdir}/qdb_rest.service
+%config(noreplace)     %{_sysconfdir}/qdb/qdb_rest.yaml
 
 %pre
 getent group qdb >/dev/null || \
@@ -77,6 +56,14 @@ getent group qdb >/dev/null || \
 getent passwd qdb >/dev/null || \
     useradd -r -g qdb -d %{_sharedstatedir}/qdb -s /sbin/nologin \
             -c "QuasarDB Database Server" qdb
+
+# Earlier versions of this package own the configuration and the
+# certificate of the old server, and rpm removes the files of a package
+# that the new version no longer lists. Each file gets a second name here,
+# and posttrans gives it its own name back.
+%{keep_file %{_sysconfdir}/qdb/qdb_rest.conf}
+%{keep_file %{_sysconfdir}/qdb/qdb_rest.cert.pem}
+%{keep_file %{_sysconfdir}/qdb/qdb_rest.key.pem}
 
 %post
 %systemd_post qdb_rest.service
@@ -88,3 +75,21 @@ getent passwd qdb >/dev/null || \
 
 %postun
 %systemd_postun_with_restart qdb_rest.service
+
+%posttrans
+%{restore_file %{_sysconfdir}/qdb/qdb_rest.conf}
+%{restore_file %{_sysconfdir}/qdb/qdb_rest.cert.pem}
+%{restore_file %{_sysconfdir}/qdb/qdb_rest.key.pem}
+# rpm keeps an edited certificate under this name, which is now a second
+# copy of the file that got its name back.
+rm -f %{_sysconfdir}/qdb/qdb_rest.cert.pem.rpmsave %{_sysconfdir}/qdb/qdb_rest.key.pem.rpmsave
+
+if [ -f %{_sysconfdir}/qdb/qdb_rest.conf ]; then
+    cat <<NOTICE
+qdb-rest: %{_sysconfdir}/qdb/qdb_rest.conf is no longer read.
+qdb-rest: The configuration is now %{_sysconfdir}/qdb/qdb_rest.yaml, in a new format,
+qdb-rest: and the service starts with the defaults of that file.
+qdb-rest: Copy your settings into it and run: systemctl restart qdb_rest
+qdb-rest: %{_sysconfdir}/qdb/qdb_rest.conf and the certificate files in %{_sysconfdir}/qdb are left in place.
+NOTICE
+fi
