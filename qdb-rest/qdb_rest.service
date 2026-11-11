@@ -1,13 +1,17 @@
 [Unit]
 Description=QuasarDB REST API
 After=network.target
-ConditionPathExists=/etc/qdb/qdb_rest.conf
+ConditionPathExists=/etc/qdb/qdb_rest.yaml
 
 [Service]
-Type=simple
+# qdb_rest reports READY=1 when its listeners are bound, and it sends a
+# keepalive at half of WatchdogSec. It logs to stdout, which the journal
+# keeps.
+Type=notify
+WatchdogSec=30
 User=qdb
 Group=qdb
-ExecStart=/usr/bin/qdb_rest --config-file /etc/qdb/qdb_rest.conf
+ExecStart=/usr/bin/qdb_rest --config /etc/qdb/qdb_rest.yaml
 Restart=on-failure
 
 [Install]
