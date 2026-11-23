@@ -12,7 +12,7 @@ commands:
   - bash qdb-code-signing/rpmsign.sh $(find . -name '*.rpm')
 
 plugins:
-  - bureau14/qdb-artifacts#master:
+  - bureau14/qdb-artifacts#sc-20192/snapshot-dependencies:
       download:
         clean: true
         projects:
