@@ -2,7 +2,7 @@ agents:
   queue: "{queue}"
 
 label: "{name}"
-key: "{slug}"
+step_id: package
 
 commands:
   - bash qdb-api/pack.sh artifacts/*-api.tar.gz
@@ -17,10 +17,13 @@ plugins:
         clean: true
         projects:
           - project_id: "qdb-pkg-archives"
+            step: [api, server, utils, rest]
             files:
               - "*.tar.gz"
             output-dir: artifacts
           - project_id: "qdb-code-signing"
+            latest: true
+            step: build
             files:
               - "qdb-code-signing.tar.gz"
             extract: true
